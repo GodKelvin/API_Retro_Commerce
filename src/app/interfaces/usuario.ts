@@ -10,4 +10,5 @@ export interface IUsuario{
     tipoUsuarioID: number;
     criadoEm?: Date;
     atualizadoEm?: Date;
+    apelido: string;
 }

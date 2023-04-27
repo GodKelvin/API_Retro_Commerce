@@ -5,10 +5,26 @@ const usuarioRouter = Router();
 usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
     try{
         let usuario = new Usuario(req.body);
-        if(usuario.errors.length) return res.status(400).json({errors: usuario.errors});
-        const resCreate = await usuario.create();
-        if(!resCreate) return res.status(400).json(resCreate);
-        return res.status(200).json(resCreate);
+        if(usuario.errors.length) return res.status(400).json({
+            success: false,
+            errors: usuario.errors
+        });
+
+        if(await usuario.emailExiste()) return res.status(400).json({
+            success: false,
+            errors: "Email já cadastrado"
+        });
+
+        // if(usuario.apelidoExiste()) return res.status(400).json({
+        //     success: false,
+        //     errors: "Apelido indisponivel"
+        // });
+
+        usuario.create();
+        return res.status(200).json({
+            success: true,
+            message: usuario.usuario
+        });
     }catch(error){
         return res.status(500).json(`Internal Server Error => ${error}`);
     }

@@ -10,17 +10,29 @@ export class Usuario{
         this.usuario = usuario;
     }
 
-    async create(): Promise<Boolean>{
+    create(): boolean{
         if(!this.errors.length){
-            let res = await db("usuarios")
-                                .insert(this.usuario)
-                                .returning('*') as IUsuario[];
-            console.log(res);
-            return true
+            db("usuarios").insert(this.usuario).returning('*')
+            .then((res: IUsuario[]) => {
+                this.usuario = res[0];
+                console.log(this.usuario);
+                return true
+            });
         }
         return false;
     }
 
+    async emailExiste(): Promise<boolean>{
+        const res = await db("usuarios").where({ email: this.usuario.email }).count().first();
+        if (res && res["count"]) return false;
+        return true;
+    }
+
+    // apelidoExiste(): boolean{
+    //     const res = db("usuarios").where({apelido: this.usuario.apelido}).count();
+    //     if(res.length) return true;
+    //     return false;
+    // }
 
     private validator(usuario: any): boolean{
         //@TODO: Validar formato dos campos
