@@ -10,14 +10,15 @@ export class Usuario{
         this.usuario = usuario;
     }
 
-    async create(){
+    async create(): Promise<Boolean>{
         if(!this.errors.length){
-            db("usuarios").insert(this.camelToSnake(this.usuario)).returning('*')
-            .then(res => {
-                console.log(res);
-                db.destroy();
-            });
+            let res = await db("usuarios")
+                                .insert(this.usuario)
+                                .returning('*') as IUsuario[];
+            console.log(res);
+            return true
         }
+        return false;
     }
 
 
@@ -35,17 +36,5 @@ export class Usuario{
             return false
         }
         return true;
-    }
-
-    private camelToSnake(objeto: any): any{
-        const keys = Object.keys(objeto);
-        const convertObject: { [key: string]: any } = {};
-
-        keys.forEach((key) => {
-            const newKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-            convertObject[newKey] = objeto[key];
-        })
-
-        return convertObject;
     }
 }

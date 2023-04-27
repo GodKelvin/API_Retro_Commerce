@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import { knexSnakeCaseMappers } from 'objection';
 
 const config: { [key: string]: Knex.Config } = {
   development: {
@@ -15,7 +16,10 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       tableName: "knex_migrations"
-    }
+    },
+
+    //Permite a conversao de camelCase para snake_case (JS <=> Banco de dados)
+    ...knexSnakeCaseMappers()
   },
 
   production: {
@@ -32,7 +36,8 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       tableName: "knex_migrations"
-    }
+    },
+    ...knexSnakeCaseMappers()
   }
 
 };
