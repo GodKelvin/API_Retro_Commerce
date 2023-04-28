@@ -15,12 +15,12 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
             errors: "Email já cadastrado"
         });
 
-        // if(usuario.apelidoExiste()) return res.status(400).json({
-        //     success: false,
-        //     errors: "Apelido indisponivel"
-        // });
+        if(await usuario.apelidoExiste()) return res.status(400).json({
+            success: false,
+            errors: "Apelido indisponivel"
+        });
 
-        usuario.create();
+        await usuario.create();
         return res.status(200).json({
             success: true,
             message: usuario.usuario

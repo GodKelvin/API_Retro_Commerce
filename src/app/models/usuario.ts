@@ -10,29 +10,26 @@ export class Usuario{
         this.usuario = usuario;
     }
 
-    create(): boolean{
+    async create(): Promise<boolean>{
         if(!this.errors.length){
-            db("usuarios").insert(this.usuario).returning('*')
-            .then((res: IUsuario[]) => {
-                this.usuario = res[0];
-                console.log(this.usuario);
-                return true
-            });
+            const res = await db("usuarios").insert(this.usuario).returning('*') as IUsuario[]
+            this.usuario = res[0];
+            return true
         }
         return false;
     }
 
     async emailExiste(): Promise<boolean>{
         const res = await db("usuarios").where({ email: this.usuario.email }).count().first();
-        if (res && res["count"]) return false;
-        return true;
+        if (res && Number(res["count"])) return true;
+        return false;
     }
 
-    // apelidoExiste(): boolean{
-    //     const res = db("usuarios").where({apelido: this.usuario.apelido}).count();
-    //     if(res.length) return true;
-    //     return false;
-    // }
+    async apelidoExiste(): Promise<boolean>{
+        const res = await db("usuarios").where({apelido: this.usuario.apelido}).count().first();
+        if(res && Number(res["count"])) return true;
+        return false;
+    }
 
     private validator(usuario: any): boolean{
         //@TODO: Validar formato dos campos
