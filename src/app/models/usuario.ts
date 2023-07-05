@@ -31,6 +31,11 @@ export class Usuario{
         return false;
     }
 
+    static async searchByApelido(apelido: string): Promise <any>{
+        const res = db("usuarios").where({apelido: apelido}).first();
+        return res;
+    }
+
     private validator(usuario: any): boolean{
         //@TODO: Validar formato dos campos
         //Se estiver algum campo pendente
