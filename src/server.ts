@@ -16,7 +16,7 @@ const port = process.env.PORT || 3000;
 knex.select(knex.raw('1')).then(() => {
     console.log("--Banco de dados conectado");
     server.listen(port, () => {
-        console.log(`--Servidor rodando na porta ${port}`);
+        console.log(`--Servidor rodando em: http://localhost:${port}/`);
     });
 }).catch((error) => {
     console.log(`>>Erro ao iniciar aplicacao: ${error}`)
