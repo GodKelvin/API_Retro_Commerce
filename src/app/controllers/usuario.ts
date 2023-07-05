@@ -31,4 +31,24 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 });
 
+usuarioRouter.get("/:apelido", async(req: Request, res: Response): Promise<any> => {
+    try{
+        if(!req.params.apelido) return res.status(400).json({
+            success: false,
+            message: "Informe um apelido"
+        });
+        let search = await Usuario.searchByApelido(req.params.apelido);
+        if(!search) return res.status(400).json({
+            success: false,
+            message: "Usuario nao encontrado"
+        });
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
+    }catch(error){
+        return res.status(500).json(`Internal Server Error => ${error}`);
+    }
+});
+
 export default usuarioRouter;
