@@ -5,7 +5,7 @@ export class Usuario{
     usuario: IUsuario;
     errors: string[] = [];
 
-    constructor(usuario: any){
+    constructor(usuario: IUsuario){
         this.validator(usuario);
         this.usuario = usuario;
     }
@@ -25,14 +25,31 @@ export class Usuario{
         return false;
     }
 
+    getId(): number | undefined{
+        return this.usuario.id;
+    }
+
+    getNome(): string{
+        return this.usuario.nome;
+    }
+
+    getApelido(): string{
+        return this.usuario.apelido;
+    }
+
     async apelidoExiste(): Promise<boolean>{
-        const res = await db("usuarios").where({apelido: this.usuario.apelido}).count().first();
+        const res = db("usuarios").where({apelido: this.usuario.apelido}).count().first();
         if(res && Number(res["count"])) return true;
         return false;
     }
 
     static async searchByApelido(apelido: string): Promise <any>{
         const res = db("usuarios").where({apelido: apelido}).first();
+        return res;
+    }
+
+    static async usuarioLogin(email: string, senha: string): Promise<IUsuario | undefined>{
+        const res = await db<IUsuario>("usuarios").where({email, senha}).first(); 
         return res;
     }
 

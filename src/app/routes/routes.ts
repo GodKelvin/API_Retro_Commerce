@@ -1,6 +1,7 @@
 import {Router} from "express";
 import { Request, Response } from "express";
 import usuarioRouter from "../controllers/usuario";
+import authRouter from "../controllers/auth";
 
 const routes = Router();
 routes.get('/', async(_req: Request, res: Response) => {
@@ -8,6 +9,7 @@ routes.get('/', async(_req: Request, res: Response) => {
 });
 
 routes.use("/usuario", usuarioRouter);
+routes.use("/login", authRouter)
 
 //Importacoes das rotas
 
