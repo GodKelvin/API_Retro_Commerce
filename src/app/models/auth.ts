@@ -7,7 +7,6 @@ export class Auth{
 
     static generateToken(usuario: Usuario): string{
         const decodedToken = {
-            id: usuario.getId(),
             nome: usuario.getNome(),
             apelido: usuario.getApelido()
         }
