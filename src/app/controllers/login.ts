@@ -1,9 +1,9 @@
 import { Request, Response, Router } from "express";
 import { Usuario } from "../models/usuario";
 import { Auth } from "../models/auth";
-const authRouter = Router();
+const loginRouter = Router();
 
-authRouter.post("/", async(req: Request, res: Response): Promise<any> => {
+loginRouter.post("/", async(req: Request, res: Response): Promise<any> => {
     const {email, senha} = req.body;
     let user = await Usuario.usuarioLogin(email, senha);
 
@@ -20,4 +20,4 @@ authRouter.post("/", async(req: Request, res: Response): Promise<any> => {
     });
 });
 
-export default authRouter;
+export default loginRouter;

@@ -39,18 +39,16 @@ export class Usuario{
 
     async apelidoExiste(): Promise<boolean>{
         const res = db("usuarios").where({apelido: this.usuario.apelido}).count().first();
-        if(res && Number(res["count"])) return true;
-        return false;
+        //Operador NOT DUPLO que converte os valores para boolean
+        return !!res && !!Number(res["count"]);
     }
 
-    static async searchByApelido(apelido: string): Promise <any>{
-        const res = db("usuarios").where({apelido: apelido}).first();
-        return res;
+    static async searchByApelido(apelido: string): Promise <IUsuario | undefined>{
+        return db<IUsuario>("usuarios").where({apelido: apelido}).first();
     }
 
     static async usuarioLogin(email: string, senha: string): Promise<IUsuario | undefined>{
-        const res = await db<IUsuario>("usuarios").where({email, senha}).first(); 
-        return res;
+        return db<IUsuario>("usuarios").where({email, senha}).first(); 
     }
 
     private validator(usuario: any): boolean{
