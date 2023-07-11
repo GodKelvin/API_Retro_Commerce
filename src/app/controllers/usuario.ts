@@ -1,5 +1,7 @@
 import { Request, Response, Router } from "express";
 import { Usuario } from "../models/usuario";
+import auth from "../middlewares/auth";
+
 const usuarioRouter = Router();
 
 usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
@@ -14,7 +16,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
             success: false,
             errors: "Email já cadastrado"
         });
-
+        console.log(await usuario.apelidoExiste());
         if(await usuario.apelidoExiste()) return res.status(400).json({
             success: false,
             errors: "Apelido indisponivel"
@@ -31,7 +33,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 });
 
-usuarioRouter.get("/:apelido", async(req: Request, res: Response): Promise<any> => {
+usuarioRouter.get("/:apelido", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.params.apelido) return res.status(400).json({
             success: false,
