@@ -1,5 +1,6 @@
 import {IUsuario} from '../interfaces/usuario';
 import db from "../../database/knexInit";
+import { hashSync } from 'bcrypt';
 
 export class Usuario{
     usuario: IUsuario;
@@ -38,7 +39,7 @@ export class Usuario{
     }
 
     async apelidoExiste(): Promise<boolean>{
-        const res = db("usuarios").where({apelido: this.usuario.apelido}).count().first();
+        const res = await db("usuarios").where({apelido: this.usuario.apelido}).count().first();
         //Operador NOT DUPLO que converte os valores para boolean
         return !!res && !!Number(res["count"]);
     }
@@ -66,4 +67,9 @@ export class Usuario{
         }
         return true;
     }
+
+    criptoSenha(){
+        this.usuario.senha = hashSync(this.usuario.senha, 9);
+    }
+
 }
