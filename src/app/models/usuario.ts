@@ -4,12 +4,25 @@ import bcrypt from "bcrypt"
 
 export class Usuario{
     usuario: IUsuario;
-    errors: string[] = [];
-
+    
     constructor(usuario: IUsuario){
         this.usuario = usuario;
     }
 
+     /*-----Metodos de instancia-----*/
+     getId(): number | undefined{
+        return this.usuario.id;
+    }
+
+    getNome(): string{
+        return this.usuario.nome;
+    }
+
+    getApelido(): string{
+        return this.usuario.apelido;
+    }
+
+    /*-----Metodos Estaticos-----*/
     static async create(usuario: any): Promise<IUsuario>{
         usuario.senha = this.criptoSenha(usuario.senha);
         return await   db("usuarios").insert(usuario)
@@ -50,21 +63,6 @@ export class Usuario{
         return !!res && !!Number(res["count"]);
     }
 
-    getId(): number | undefined{
-        return this.usuario.id;
-    }
-
-    getNome(): string{
-        return this.usuario.nome;
-    }
-
-    getApelido(): string{
-        return this.usuario.apelido;
-    }
-
-    
-
-
     //Retorna campos sensiveis
     static async searchFullByApelido(apelido: string): Promise <IUsuario | undefined>{
         return  db("usuarios").where({apelido: apelido}).first();
@@ -82,19 +80,18 @@ export class Usuario{
         //return db<IUsuario>("usuarios").where({email, senha}).first(); 
         const user = await db<IUsuario>("usuarios").where({email}).first(); 
         if(!user) return false;
-        const login = await Usuario.compareSenhaCripto(senha, user);
+        const login = await this.compareSenhaCripto(senha, user);
         if(!login) return false;
         return new Usuario(user);
 
     }
 
-    
-
+    /*-----Metodos privados-----*/
     private static criptoSenha(senha: string): string{
         return bcrypt.hashSync(senha, 9);
     }
 
-    static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
+    private static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
         return bcrypt.compare(senha, usuario.senha);
     }
 
