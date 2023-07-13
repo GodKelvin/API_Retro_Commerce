@@ -14,7 +14,7 @@ export class Auth{
         }
         let secret = process.env.TOKEN_JWT || "";
         return jwt.sign(decodedToken, secret, {
-            expiresIn: "10s"
+            expiresIn: "1d"
         });
     }
 
