@@ -8,30 +8,29 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
     try{
         if(req.body.senha != req.body.confirmarSenha) return res.status(400).json({
             success: false,
-            errors: "Senhas nao conferem"
+            message: "Senhas nao conferem"
         });
         delete req.body.confirmarSenha;
-        let usuario = new Usuario(req.body);
-        if(usuario.errors.length) return res.status(400).json({
+        const validatorFields = Usuario.validatorFieldsForCreate(req.body);
+        if(validatorFields.length) return res.status(400).json({
             success: false,
-            errors: usuario.errors
+            message: validatorFields
         });
 
-        if(await usuario.emailExiste()) return res.status(400).json({
+        if(await Usuario.emailExiste(req.body.email)) return res.status(400).json({
             success: false,
-            errors: "Email já cadastrado"
+            message: "Email já cadastrado"
         });
         
-        if(await usuario.apelidoExiste()) return res.status(400).json({
+        if(await Usuario.apelidoExiste(req.body.apelido)) return res.status(400).json({
             success: false,
-            errors: "Apelido indisponivel"
+            message: "Apelido indisponivel"
         });
 
-        usuario.criptoSenha();
-        await usuario.create();
+        const newUser = await Usuario.create(req.body);
         return res.status(200).json({
             success: true,
-            message: usuario.usuario
+            message: newUser
         });
     }catch(error){
         return res.status(500).json(`Internal Server Error => ${error}`);

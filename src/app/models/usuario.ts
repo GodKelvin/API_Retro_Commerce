@@ -7,27 +7,47 @@ export class Usuario{
     errors: string[] = [];
 
     constructor(usuario: IUsuario){
-        this.validator(usuario);
         this.usuario = usuario;
     }
 
-    async create(): Promise<boolean>{
-        if(!this.errors.length){
-            const res = await   db("usuarios").insert(this.usuario)
-                                .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario[]
-            this.usuario = res[0];
-            return true
-        }
-        return false;
+    static async create(usuario: any): Promise<IUsuario>{
+        usuario.senha = this.criptoSenha(usuario.senha);
+        return await   db("usuarios").insert(usuario)
+                        .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
     }
 
-    async emailExiste(): Promise<boolean>{
+    static validatorFieldsForCreate(usuario: any): Array<string>{
+        //@TODO: Validar formato dos campos
+        //Se estiver algum campo pendente
+        const errors: string[] = [];
+        const atributos = ["nome", "senha", "email", "dataNascimento", "apelido"];
+        const atributosPendentes = atributos.filter(chave => {
+            return usuario[chave] == undefined;
+        });
+
+        //Se tiver algum atributo pendente
+        if(atributosPendentes.length){
+            errors.push(`Atributos pendentes: ${atributosPendentes.join(", ")}`);
+        }
+        return errors
+        
+    }
+
+    static async emailExiste(email: string): Promise<boolean>{
         const res = await   db("usuarios")
-                            .whereRaw("lower(email) = ?", this.usuario.email.toLowerCase())
+                            .whereRaw("lower(email) = ?", email.toLowerCase())
                             .count().first();
 
         //Operador NOT DUPLO que converte os valores para boolean                            
         return !!res && !!Number(res["count"]);                            
+    }
+
+    static async apelidoExiste(apelido: string): Promise<boolean>{
+        const res = await db("usuarios")
+                    .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
+                    .count().first();
+        //Operador NOT DUPLO que converte os valores para boolean
+        return !!res && !!Number(res["count"]);
     }
 
     getId(): number | undefined{
@@ -42,13 +62,7 @@ export class Usuario{
         return this.usuario.apelido;
     }
 
-    async apelidoExiste(): Promise<boolean>{
-        const res = await db("usuarios")
-                    .whereRaw("lower(apelido) = ?", this.usuario.apelido.toLowerCase())
-                    .count().first();
-        //Operador NOT DUPLO que converte os valores para boolean
-        return !!res && !!Number(res["count"]);
-    }
+    
 
 
     //Retorna campos sensiveis
@@ -74,24 +88,10 @@ export class Usuario{
 
     }
 
-    private validator(usuario: any): boolean{
-        //@TODO: Validar formato dos campos
-        //Se estiver algum campo pendente
-        const atributos = ["nome", "senha", "email", "dataNascimento", "apelido"];
-        const atributosPendentes = atributos.filter(chave => {
-            return usuario[chave] == undefined;
-        });
+    
 
-        //Se tiver algum atributo pendente
-        if(atributosPendentes.length){
-            this.errors.push(`Atributos pendentes: ${atributosPendentes.join(", ")}`);
-            return false
-        }
-        return true;
-    }
-
-    criptoSenha(): void{
-        this.usuario.senha = bcrypt.hashSync(this.usuario.senha, 9);
+    private static criptoSenha(senha: string): string{
+        return bcrypt.hashSync(senha, 9);
     }
 
     static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
