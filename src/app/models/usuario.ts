@@ -13,7 +13,8 @@ export class Usuario{
 
     async create(): Promise<boolean>{
         if(!this.errors.length){
-            const res = await db("usuarios").insert(this.usuario).returning('*') as IUsuario[]
+            const res = await   db("usuarios").insert(this.usuario)
+                                .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario[]
             this.usuario = res[0];
             return true
         }
@@ -21,9 +22,12 @@ export class Usuario{
     }
 
     async emailExiste(): Promise<boolean>{
-        const res = await db("usuarios").where({ email: this.usuario.email }).count().first();
-        if (res && Number(res["count"])) return true;
-        return false;
+        const res = await   db("usuarios")
+                            .whereRaw("lower(email) = ?", this.usuario.email.toLowerCase())
+                            .count().first();
+
+        //Operador NOT DUPLO que converte os valores para boolean                            
+        return !!res && !!Number(res["count"]);                            
     }
 
     getId(): number | undefined{
@@ -39,13 +43,25 @@ export class Usuario{
     }
 
     async apelidoExiste(): Promise<boolean>{
-        const res = await db("usuarios").where({apelido: this.usuario.apelido}).count().first();
+        const res = await db("usuarios")
+                    .whereRaw("lower(apelido) = ?", this.usuario.apelido.toLowerCase())
+                    .count().first();
         //Operador NOT DUPLO que converte os valores para boolean
         return !!res && !!Number(res["count"]);
     }
 
+
+    //Retorna campos sensiveis
+    static async searchFullByApelido(apelido: string): Promise <IUsuario | undefined>{
+        return  db("usuarios").where({apelido: apelido}).first();
+    }
+
+    //Nao retorna campos sensiveis
     static async searchByApelido(apelido: string): Promise <IUsuario | undefined>{
-        return db<IUsuario>("usuarios").where({apelido: apelido}).first();
+        return  db("usuarios")
+                .select("foto", "nome", "apelido", "bio", "avaliacao")
+                .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
+                .first();
     }
 
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
