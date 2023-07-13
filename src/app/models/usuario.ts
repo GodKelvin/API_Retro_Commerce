@@ -1,5 +1,6 @@
 import {IUsuario} from '../interfaces/usuario';
 import db from "../../database/knexInit";
+import bcrypt from "bcrypt"
 
 export class Usuario{
     usuario: IUsuario;
@@ -38,7 +39,7 @@ export class Usuario{
     }
 
     async apelidoExiste(): Promise<boolean>{
-        const res = db("usuarios").where({apelido: this.usuario.apelido}).count().first();
+        const res = await db("usuarios").where({apelido: this.usuario.apelido}).count().first();
         //Operador NOT DUPLO que converte os valores para boolean
         return !!res && !!Number(res["count"]);
     }
@@ -47,8 +48,14 @@ export class Usuario{
         return db<IUsuario>("usuarios").where({apelido: apelido}).first();
     }
 
-    static async usuarioLogin(email: string, senha: string): Promise<IUsuario | undefined>{
-        return db<IUsuario>("usuarios").where({email, senha}).first(); 
+    static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
+        //return db<IUsuario>("usuarios").where({email, senha}).first(); 
+        const user = await db<IUsuario>("usuarios").where({email}).first(); 
+        if(!user) return false;
+        const login = await Usuario.compareSenhaCripto(senha, user);
+        if(!login) return false;
+        return new Usuario(user);
+
     }
 
     private validator(usuario: any): boolean{
@@ -66,4 +73,13 @@ export class Usuario{
         }
         return true;
     }
+
+    criptoSenha(): void{
+        this.usuario.senha = bcrypt.hashSync(this.usuario.senha, 9);
+    }
+
+    static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
+        return bcrypt.compare(senha, usuario.senha);
+    }
+
 }

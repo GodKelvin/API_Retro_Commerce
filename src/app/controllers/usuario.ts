@@ -6,6 +6,11 @@ const usuarioRouter = Router();
 
 usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
     try{
+        if(req.body.senha != req.body.confirmarSenha) return res.status(400).json({
+            success: false,
+            errors: "Senhas nao conferem"
+        });
+        delete req.body.confirmarSenha;
         let usuario = new Usuario(req.body);
         if(usuario.errors.length) return res.status(400).json({
             success: false,
@@ -16,12 +21,13 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
             success: false,
             errors: "Email já cadastrado"
         });
-        console.log(await usuario.apelidoExiste());
+        
         if(await usuario.apelidoExiste()) return res.status(400).json({
             success: false,
             errors: "Apelido indisponivel"
         });
 
+        usuario.criptoSenha();
         await usuario.create();
         return res.status(200).json({
             success: true,
