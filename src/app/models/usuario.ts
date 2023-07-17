@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 
 export class Usuario{
     usuario: IUsuario;
-    
+
     constructor(usuario: IUsuario){
         this.usuario = usuario;
     }
@@ -77,13 +77,11 @@ export class Usuario{
     }
 
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
-        //return db<IUsuario>("usuarios").where({email, senha}).first(); 
         const user = await db<IUsuario>("usuarios").where({email}).first(); 
         if(!user) return false;
         const login = await this.compareSenhaCripto(senha, user);
         if(!login) return false;
         return new Usuario(user);
-
     }
 
     /*-----Metodos privados-----*/
