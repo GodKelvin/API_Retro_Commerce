@@ -23,4 +23,9 @@ export class Auth{
         const data = jwt.verify(String(token), secret) as ITokenJWT;
         return Usuario.searchByApelido(data.apelido);        
     }
+
+    static async checkUserBodyToken(token: string, apelido: string): Promise<boolean>{
+        const usuario = await Auth.verifyToken(String(token));
+        return !!(usuario && usuario.apelido == apelido);
+    }
 }

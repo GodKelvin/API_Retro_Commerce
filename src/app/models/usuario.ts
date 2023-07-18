@@ -73,10 +73,6 @@ export class Usuario{
         if(atributosIndisponiveis.length){
             errors.push(`Atributos indisponiveis: ${atributosIndisponiveis.join(", ")}`);
         }
-
-        if(!usuario.originalApelido){
-            errors.push(`Apelido original pendente`);
-        }
         return errors
     }
 

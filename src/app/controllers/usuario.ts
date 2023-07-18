@@ -60,8 +60,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        const usuarioLogado = await Auth.verifyToken(String(req.headers.authorization));
-        if(usuarioLogado && (usuarioLogado.apelido != req.body.originalApelido)) return res.status(401).json({
+        if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.originalApelido)) return res.status(401).json({
             success: false,
             message: "Acesso negado"
         });
@@ -82,12 +81,6 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
             message: "Apelido indisponivel"
         });
 
-        //Sempre atualizar com base no apelido
-        if(!await Usuario.apelidoExiste(req.body.originalApelido)) return res.status(400).json({
-            success: false,
-            message: "Usuario nao encontrado"
-        });
-
         const originalApelido = req.body.originalApelido
         delete req.body.originalApelido;
         const usuario = new Usuario(req.body);
@@ -102,9 +95,15 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
             error: error
         })
     }
-   
+});
 
-   
+usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.apelido)) return res.status(401).json({
+        success: false,
+        message: "Acesso negado"
+    });
+
+
 });
 
 
