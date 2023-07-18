@@ -39,7 +39,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
         if(await Usuario.emailExiste(req.body.email)) return res.status(400).json({
             success: false,
-            message: "Email já cadastrado"
+            message: "Email indisponivel"
         });
         
         if(await Usuario.apelidoExiste(req.body.apelido)) return res.status(400).json({
@@ -58,8 +58,48 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 });
 
-usuarioRouter.put("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
-    
+usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+
+    try{
+        const validate = Usuario.validateFieldsForUpdate(req.body);
+        if(validate.length) return res.status(400).json({
+            success: false,
+            message: validate
+        });
+
+        if(req.body.email && await Usuario.emailExiste(req.body.email)) return res.status(400).json({
+            success: false,
+            message: "Email indisponivel"
+        });
+
+        if(req.body.apelido && await Usuario.apelidoExiste(req.body.apelido)) return res.status(400).json({
+            success: false,
+            message: "Apelido indisponivel"
+        });
+
+        //Sempre atualizar com base no apelido
+        if(!await Usuario.apelidoExiste(req.body.originalApelido)) return res.status(400).json({
+            success: false,
+            message: "Usuario nao encontrado"
+        });
+
+        const originalApelido = req.body.originalApelido
+        delete req.body.originalApelido;
+        const usuario = new Usuario(req.body);
+        const resUpdate = await usuario.update(originalApelido);
+
+        return res.status(200).json({
+            success: true,
+            message: resUpdate
+        });
+    }catch(error){
+        res.status(500).json({
+            error: error
+        })
+    }
+   
+
+   
 });
 
 

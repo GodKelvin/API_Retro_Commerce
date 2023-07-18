@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"
 
 export class Usuario{
     usuario: IUsuario;
+    static readonly camposPublicos  = ["foto", "nome", "bio", "apelido", "avaliacao"];
 
     constructor(usuario: IUsuario){
         this.usuario = usuario;
@@ -20,6 +21,18 @@ export class Usuario{
 
     getApelido(): string{
         return this.usuario.apelido;
+    }
+
+    async update(originalApelido: string): Promise<IUsuario>{
+        //Caso queira mudar o apelido
+        if(this.usuario.senha){
+            this.usuario.senha = Usuario.criptoSenha(this.usuario.senha);
+        }
+
+        return await db("usuarios")
+                    .where({apelido: originalApelido})
+                    .update({...this.usuario, ...{atualizado_em: db.fn.now()}})
+                    .returning(Usuario.camposPublicos);
     }
 
     /*-----Metodos Estaticos-----*/
@@ -44,6 +57,27 @@ export class Usuario{
         }
         return errors
         
+    }
+
+    static validateFieldsForUpdate(usuario: any): Array<string>{
+        const errors: string[] = [];
+        const atributosDisponiveis = ["foto", "email", "nome", "apelido", "senha", "dataNascimento", 
+                            "bio", "tipo_usuario_id", "status_usuario_id", "originalApelido"];
+
+        const chavesUsuario = Object.keys(usuario);
+
+        const atributosIndisponiveis = chavesUsuario.filter(chave => {
+            return !atributosDisponiveis.includes(chave)
+        });
+
+        if(atributosIndisponiveis.length){
+            errors.push(`Atributos indisponiveis: ${atributosIndisponiveis.join(", ")}`);
+        }
+
+        if(!usuario.originalApelido){
+            errors.push(`Apelido original pendente`);
+        }
+        return errors
     }
 
     static async emailExiste(email: string): Promise<boolean>{
@@ -71,7 +105,7 @@ export class Usuario{
     //Nao retorna campos sensiveis
     static async searchByApelido(apelido: string): Promise <IUsuario | undefined>{
         return  db("usuarios")
-                .select("foto", "nome", "apelido", "bio", "avaliacao")
+                .select(this.camposPublicos)
                 .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
                 .first();
     }
