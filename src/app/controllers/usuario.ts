@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
-
+import { Auth } from "../models/auth";
 const usuarioRouter = Router();
 
 usuarioRouter.get("/:apelido", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
@@ -59,8 +59,13 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 });
 
 usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
-
     try{
+        const usuarioLogado = await Auth.verifyToken(String(req.headers.authorization));
+        if(usuarioLogado && (usuarioLogado.apelido != req.body.originalApelido)) return res.status(401).json({
+            success: false,
+            message: "Acesso negado"
+        });
+
         const validate = Usuario.validateFieldsForUpdate(req.body);
         if(validate.length) return res.status(400).json({
             success: false,
