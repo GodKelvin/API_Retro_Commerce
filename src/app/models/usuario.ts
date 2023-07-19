@@ -35,6 +35,12 @@ export class Usuario{
                     .returning(Usuario.camposPublicos);
     }
 
+    async desativa(): Promise<IUsuario>{
+        return await db("usuarios").where({apelido: this.usuario.apelido})
+                    .update({ativo: false})
+                    .returning(Usuario.camposPublicos);
+    }
+
     /*-----Metodos Estaticos-----*/
     static async create(usuario: any): Promise<IUsuario>{
         usuario.senha = this.criptoSenha(usuario.senha);

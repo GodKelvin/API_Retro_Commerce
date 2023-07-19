@@ -91,19 +91,37 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
             message: resUpdate
         });
     }catch(error){
-        res.status(500).json({
+        return res.status(500).json({
             error: error
         })
     }
 });
 
 usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
-    if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.originalApelido)) return res.status(401).json({
-        success: false,
-        message: "Acesso negado"
-    });
+    try{
+        if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.originalApelido)) return res.status(401).json({
+            success: false,
+            message: "Acesso negado"
+        });
 
-    
+        if(!req.body.apelido) return res.status(400).json({
+            success: false,
+            message: "Apelido pendente"
+        });
+
+        const usuario = new Usuario(req.body);
+        const resDesativa = await usuario.desativa();
+
+        return res.status(200).json({
+            success: true,
+            message: resDesativa
+        });
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            error: error
+        });
+    }
 });
 
 
