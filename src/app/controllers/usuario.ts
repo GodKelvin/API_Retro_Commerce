@@ -98,12 +98,12 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
 });
 
 usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
-    if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.apelido)) return res.status(401).json({
+    if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.originalApelido)) return res.status(401).json({
         success: false,
         message: "Acesso negado"
     });
 
-
+    
 });
 
 
