@@ -111,12 +111,13 @@ export class Usuario{
     static async searchByApelido(apelido: string): Promise <IUsuario | undefined>{
         return  db("usuarios")
                 .select(this.camposPublicos)
+                .where({ativo: true})
                 .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
                 .first();
     }
 
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
-        const user = await db<IUsuario>("usuarios").where({email}).first(); 
+        const user = await db<IUsuario>("usuarios").where({email: email, ativo: true}).first(); 
         if(!user) return false;
         const login = await this.compareSenhaCripto(senha, user);
         if(!login) return false;
