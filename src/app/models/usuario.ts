@@ -38,6 +38,9 @@ export class Usuario{
     /*-----Metodos Estaticos-----*/
     static async create(usuario: any): Promise<IUsuario>{
         usuario.senha = this.criptoSenha(usuario.senha);
+        const idUsuarioComum = await this.searchIdUsuarioComum();
+        console.log(idUsuarioComum);
+        if(idUsuarioComum) usuario = {...usuario, ...{tipo_usuario_id: idUsuarioComum}}
         return await   db("usuarios").insert(usuario)
                         .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
     }
@@ -121,6 +124,11 @@ export class Usuario{
 
     private static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
         return bcrypt.compare(senha, usuario.senha);
+    }
+
+    private static async searchIdUsuarioComum(): Promise<number | undefined>{
+        const res = await db("tipos_usuarios").where({tipo: "comum"}).select("id").first();
+        return res ? res.id : undefined;
     }
 
 }
