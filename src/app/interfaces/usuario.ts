@@ -4,6 +4,7 @@ export interface IUsuario{
     email: string;
     nome: string;
     senha: string;
+    ativo: boolean;
     dataNascimento: Date;
     bio?: string;
     avaliacao?: number;

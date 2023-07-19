@@ -4,33 +4,14 @@ import bcrypt from "bcrypt"
 
 export class Usuario{
     usuario: IUsuario;
-    errors: string[] = [];
+    static readonly camposPublicos  = ["foto", "nome", "bio", "apelido", "avaliacao"];
 
     constructor(usuario: IUsuario){
-        this.validator(usuario);
         this.usuario = usuario;
     }
 
-    async create(): Promise<boolean>{
-        if(!this.errors.length){
-            const res = await   db("usuarios").insert(this.usuario)
-                                .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario[]
-            this.usuario = res[0];
-            return true
-        }
-        return false;
-    }
-
-    async emailExiste(): Promise<boolean>{
-        const res = await   db("usuarios")
-                            .whereRaw("lower(email) = ?", this.usuario.email.toLowerCase())
-                            .count().first();
-
-        //Operador NOT DUPLO que converte os valores para boolean                            
-        return !!res && !!Number(res["count"]);                            
-    }
-
-    getId(): number | undefined{
+     /*-----Metodos de instancia-----*/
+     getId(): number | undefined{
         return this.usuario.id;
     }
 
@@ -42,14 +23,84 @@ export class Usuario{
         return this.usuario.apelido;
     }
 
-    async apelidoExiste(): Promise<boolean>{
+    async update(originalApelido: string): Promise<IUsuario>{
+        //Caso queira mudar o apelido
+        if(this.usuario.senha){
+            this.usuario.senha = Usuario.criptoSenha(this.usuario.senha);
+        }
+
+        return await db("usuarios")
+                    .where({apelido: originalApelido})
+                    .update({...this.usuario, ...{atualizado_em: db.fn.now()}})
+                    .returning(Usuario.camposPublicos);
+    }
+
+    async desativa(): Promise<IUsuario>{
+        return await db("usuarios").where({apelido: this.usuario.apelido})
+                    .update({ativo: false})
+                    .returning(Usuario.camposPublicos);
+    }
+
+    /*-----Metodos Estaticos-----*/
+    static async create(usuario: any): Promise<IUsuario>{
+        usuario.senha = this.criptoSenha(usuario.senha);
+        const idUsuarioComum = await this.searchIdUsuarioComum();
+        console.log(idUsuarioComum);
+        if(idUsuarioComum) usuario = {...usuario, ...{tipo_usuario_id: idUsuarioComum}}
+        return await   db("usuarios").insert(usuario)
+                        .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
+    }
+
+    static validatorFieldsForCreate(usuario: any): Array<string>{
+        //@TODO: Validar formato dos campos
+        //Se estiver algum campo pendente
+        const errors: string[] = [];
+        const atributos = ["nome", "senha", "email", "dataNascimento", "apelido"];
+        const atributosPendentes = atributos.filter(chave => {
+            return usuario[chave] == undefined;
+        });
+
+        //Se tiver algum atributo pendente
+        if(atributosPendentes.length){
+            errors.push(`Atributos pendentes: ${atributosPendentes.join(", ")}`);
+        }
+        return errors
+        
+    }
+
+    static validateFieldsForUpdate(usuario: any): Array<string>{
+        const errors: string[] = [];
+        const atributosDisponiveis = ["foto", "email", "nome", "apelido", "senha", "dataNascimento", 
+                            "bio", "tipo_usuario_id", "status_usuario_id", "originalApelido"];
+
+        const chavesUsuario = Object.keys(usuario);
+
+        const atributosIndisponiveis = chavesUsuario.filter(chave => {
+            return !atributosDisponiveis.includes(chave)
+        });
+
+        if(atributosIndisponiveis.length){
+            errors.push(`Atributos indisponiveis: ${atributosIndisponiveis.join(", ")}`);
+        }
+        return errors
+    }
+
+    static async emailExiste(email: string): Promise<boolean>{
+        const res = await   db("usuarios")
+                            .whereRaw("lower(email) = ?", email.toLowerCase())
+                            .count().first();
+
+        //Operador NOT DUPLO que converte os valores para boolean                            
+        return !!res && !!Number(res["count"]);                            
+    }
+
+    static async apelidoExiste(apelido: string): Promise<boolean>{
         const res = await db("usuarios")
-                    .whereRaw("lower(apelido) = ?", this.usuario.apelido.toLowerCase())
+                    .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
                     .count().first();
         //Operador NOT DUPLO que converte os valores para boolean
         return !!res && !!Number(res["count"]);
     }
-
 
     //Retorna campos sensiveis
     static async searchFullByApelido(apelido: string): Promise <IUsuario | undefined>{
@@ -59,43 +110,31 @@ export class Usuario{
     //Nao retorna campos sensiveis
     static async searchByApelido(apelido: string): Promise <IUsuario | undefined>{
         return  db("usuarios")
-                .select("foto", "nome", "apelido", "bio", "avaliacao")
+                .select(this.camposPublicos)
                 .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
                 .first();
     }
 
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
-        //return db<IUsuario>("usuarios").where({email, senha}).first(); 
         const user = await db<IUsuario>("usuarios").where({email}).first(); 
         if(!user) return false;
-        const login = await Usuario.compareSenhaCripto(senha, user);
+        const login = await this.compareSenhaCripto(senha, user);
         if(!login) return false;
         return new Usuario(user);
-
     }
 
-    private validator(usuario: any): boolean{
-        //@TODO: Validar formato dos campos
-        //Se estiver algum campo pendente
-        const atributos = ["nome", "senha", "email", "dataNascimento", "apelido"];
-        const atributosPendentes = atributos.filter(chave => {
-            return usuario[chave] == undefined;
-        });
-
-        //Se tiver algum atributo pendente
-        if(atributosPendentes.length){
-            this.errors.push(`Atributos pendentes: ${atributosPendentes.join(", ")}`);
-            return false
-        }
-        return true;
+    /*-----Metodos privados-----*/
+    private static criptoSenha(senha: string): string{
+        return bcrypt.hashSync(senha, 9);
     }
 
-    criptoSenha(): void{
-        this.usuario.senha = bcrypt.hashSync(this.usuario.senha, 9);
-    }
-
-    static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
+    private static async compareSenhaCripto(senha: string, usuario: IUsuario): Promise<boolean>{
         return bcrypt.compare(senha, usuario.senha);
+    }
+
+    private static async searchIdUsuarioComum(): Promise<number | undefined>{
+        const res = await db("tipos_usuarios").where({tipo: "comum"}).select("id").first();
+        return res ? res.id : undefined;
     }
 
 }

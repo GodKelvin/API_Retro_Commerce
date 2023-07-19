@@ -14,10 +14,11 @@ CREATE TABLE "usuarios" (
   "senha" varchar(255) NOT NULL,
   "data_nascimento" date NOT NULL,
   "bio" varchar(50),
-  "avaliacao" float,
-  "tipo_usuario_id" integer,
+  "avaliacao" float DEFAULT 0,
+  "ativo" boolean DEFAULT true,
   "criado_em" timestamp DEFAULT (now()),
-  "atualizado_em" timestamp DEFAULT (now())
+  "atualizado_em" timestamp DEFAULT (now()),
+  "tipo_usuario_id" integer
 );
 
 CREATE TABLE "tipos_documentos" (
