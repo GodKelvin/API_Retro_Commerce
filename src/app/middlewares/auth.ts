@@ -16,6 +16,9 @@ class AuthMiddleware{
                 message: "Acesso negado"
             });
 
+            //Deixando o apelido visivel para a requisicao
+            res.locals.apelido = usuario.apelido;
+
             return next();
 
         }catch(error){
