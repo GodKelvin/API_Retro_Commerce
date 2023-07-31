@@ -60,11 +60,6 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.originalApelido)) return res.status(401).json({
-            success: false,
-            message: "Acesso negado"
-        });
-
         const validate = Usuario.validateFieldsForUpdate(req.body);
         if(validate.length) return res.status(400).json({
             success: false,
@@ -81,10 +76,8 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
             message: "Apelido indisponivel"
         });
 
-        const originalApelido = req.body.originalApelido
-        delete req.body.originalApelido;
         const usuario = new Usuario(req.body);
-        const resUpdate = await usuario.update(originalApelido);
+        const resUpdate = await usuario.update(res.locals.apelido);
 
         return res.status(200).json({
             success: true,
@@ -99,19 +92,7 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
 
 usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        if(!await Auth.checkUserBodyToken(String(req.headers.authorization), req.body.originalApelido)) return res.status(401).json({
-            success: false,
-            message: "Acesso negado"
-        });
-
-        if(!req.body.apelido) return res.status(400).json({
-            success: false,
-            message: "Apelido pendente"
-        });
-
-        const usuario = new Usuario(req.body);
-        const resDesativa = await usuario.desativa();
-
+        const resDesativa = await Usuario.desativa(res.locals.apelido);
         return res.status(200).json({
             success: true,
             message: resDesativa

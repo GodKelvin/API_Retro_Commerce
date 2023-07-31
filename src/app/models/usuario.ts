@@ -45,10 +45,15 @@ export class Usuario{
     static async create(usuario: any): Promise<IUsuario>{
         usuario.senha = this.criptoSenha(usuario.senha);
         const idUsuarioComum = await this.searchIdUsuarioComum();
-        console.log(idUsuarioComum);
         if(idUsuarioComum) usuario = {...usuario, ...{tipo_usuario_id: idUsuarioComum}}
         return await   db("usuarios").insert(usuario)
                         .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
+    }
+
+    static async desativa(apelido: string): Promise<IUsuario>{
+        return await db("usuarios").where({apelido: apelido})
+                    .update({ativo: false})
+                    .returning(Usuario.camposPublicos);
     }
 
     static validatorFieldsForCreate(usuario: any): Array<string>{
@@ -71,7 +76,7 @@ export class Usuario{
     static validateFieldsForUpdate(usuario: any): Array<string>{
         const errors: string[] = [];
         const atributosDisponiveis = ["foto", "email", "nome", "apelido", "senha", "dataNascimento", 
-                            "bio", "tipo_usuario_id", "status_usuario_id", "originalApelido"];
+                            "bio", "tipo_usuario_id", "status_usuario_id"];
 
         const chavesUsuario = Object.keys(usuario);
 
