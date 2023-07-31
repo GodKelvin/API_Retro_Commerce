@@ -92,9 +92,7 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
 
 usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        const usuario = new Usuario(res.locals.apelido);
-        const resDesativa = await usuario.desativa();
-
+        const resDesativa = await Usuario.desativa(res.locals.apelido);
         return res.status(200).json({
             success: true,
             message: resDesativa

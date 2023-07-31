@@ -50,6 +50,12 @@ export class Usuario{
                         .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
     }
 
+    static async desativa(apelido: string): Promise<IUsuario>{
+        return await db("usuarios").where({apelido: apelido})
+                    .update({ativo: false})
+                    .returning(Usuario.camposPublicos);
+    }
+
     static validatorFieldsForCreate(usuario: any): Array<string>{
         //@TODO: Validar formato dos campos
         //Se estiver algum campo pendente
