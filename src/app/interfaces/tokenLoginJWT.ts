@@ -1,4 +1,4 @@
-export interface ITokenJWT{
+export interface ITokenLoginJWT{
     nome: string;
     apelido: string;
 }

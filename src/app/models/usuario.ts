@@ -23,6 +23,10 @@ export class Usuario{
         return this.usuario.apelido;
     }
 
+    getEmail(): string{
+        return this.usuario.email;
+    }
+    
     async update(originalApelido: string): Promise<IUsuario>{
         //Caso queira mudar o apelido
         if(this.usuario.senha){
@@ -42,12 +46,15 @@ export class Usuario{
     }
 
     /*-----Metodos Estaticos-----*/
-    static async create(usuario: any): Promise<IUsuario>{
+    static async create(usuario: any): Promise<Usuario>{
         usuario.senha = this.criptoSenha(usuario.senha);
         const idUsuarioComum = await this.searchIdUsuarioComum();
         if(idUsuarioComum) usuario = {...usuario, ...{tipo_usuario_id: idUsuarioComum}}
-        return await   db("usuarios").insert(usuario)
-                        .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
+
+        //Desestruturando o primeiro elemento do array e transformando num IUsuario
+        const [newUser] =  await   db("usuarios").insert(usuario)
+                        .returning(["foto", "nome", "bio", "apelido", "avaliacao", "email"]) as IUsuario[];
+        return new Usuario(newUser);
     }
 
     static async desativa(apelido: string): Promise<IUsuario>{
