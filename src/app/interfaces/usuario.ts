@@ -12,4 +12,5 @@ export interface IUsuario{
     criadoEm?: Date;
     atualizadoEm?: Date;
     apelido: string;
+    emailConfirmado: boolean
 }

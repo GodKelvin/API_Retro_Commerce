@@ -14,7 +14,7 @@ loginRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
     return res.status(200).json({
         success: true,
-        token: Auth.generateToken(user)
+        message:{token: Auth.generateTokenLogin(user)}
     });
 });
 

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Conta</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; line-height: 1.6;">
+
+    <h1>Confirmação de Conta</h1>
+
+    <p>Olá {{usuario}},</p>
+
+    <p>Bem-vindo ao Retro Commerce! Para ativar sua conta, clique no botão abaixo:</p>
+
+    <!-- Aqui você pode adicionar o link de confirmação personalizado usando a tag 'a' -->
+    <a href="{{confirmationLink}}" style="display: inline-block; background-color: #007bff; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 4px;">Confirmar Conta</a>
+
+    <p>Ou copie e cole o link abaixo no seu navegador:</p>
+
+    <p>{{confirmationLink}}</p>
+
+    <p>Se você não se cadastrou em nosso site, por favor, ignore este email.</p>
+
+    <p>Obrigado!</p>
+</body>
+
+</html>

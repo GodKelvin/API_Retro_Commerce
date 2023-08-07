@@ -23,6 +23,10 @@ export class Usuario{
         return this.usuario.apelido;
     }
 
+    getEmail(): string{
+        return this.usuario.email;
+    }
+    
     async update(originalApelido: string): Promise<IUsuario>{
         //Caso queira mudar o apelido
         if(this.usuario.senha){
@@ -42,12 +46,21 @@ export class Usuario{
     }
 
     /*-----Metodos Estaticos-----*/
-    static async create(usuario: any): Promise<IUsuario>{
+    static async create(usuario: any): Promise<Usuario>{
         usuario.senha = this.criptoSenha(usuario.senha);
         const idUsuarioComum = await this.searchIdUsuarioComum();
         if(idUsuarioComum) usuario = {...usuario, ...{tipo_usuario_id: idUsuarioComum}}
-        return await   db("usuarios").insert(usuario)
-                        .returning(["foto", "nome", "bio", "apelido", "avaliacao"]) as IUsuario
+
+        //Desestruturando o primeiro elemento do array e transformando num IUsuario
+        const [newUser] =  await   db("usuarios").insert(usuario)
+                        .returning(["foto", "nome", "bio", "apelido", "avaliacao", "email"]) as IUsuario[];
+        return new Usuario(newUser);
+    }
+
+    static async confirmEmail(email: string): Promise<IUsuario>{
+        return await db("usuarios").where({email})
+                    .update({ativo: true, emailConfirmado: true})
+                    .returning(Usuario.camposPublicos);
     }
 
     static async desativa(apelido: string): Promise<IUsuario>{
@@ -121,8 +134,16 @@ export class Usuario{
                 .first();
     }
 
+    static async searchForConfirmEmail(email: string): Promise<IUsuario | undefined>{
+        return  db("usuarios")
+                .select("email")
+                .where({ativo: true})
+                .whereRaw("lower(email) = ?", email.toLowerCase())
+                .first();
+    }
+
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
-        const user = await db<IUsuario>("usuarios").where({email: email, ativo: true}).first(); 
+        const user = await db<IUsuario>("usuarios").where({email: email, ativo: true, emailConfirmado: true}).first(); 
         if(!user) return false;
         const login = await this.compareSenhaCripto(senha, user);
         if(!login) return false;

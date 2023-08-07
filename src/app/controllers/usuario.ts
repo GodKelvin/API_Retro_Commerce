@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
-import { Auth } from "../models/auth";
+import { Mailer } from "../models/mailer";
 const usuarioRouter = Router();
 
 usuarioRouter.get("/:apelido", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
@@ -48,9 +48,11 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
         });
 
         const newUser = await Usuario.create(req.body);
+        const linkConfirmEmail = await Mailer.EnviaEmailConfirmacao(newUser, String(req.headers.host));
+
         return res.status(200).json({
             success: true,
-            message: newUser
+            message: {link_confirm_email: linkConfirmEmail}
         });
     }catch(error){
         return res.status(500).json(`Internal Server Error => ${error}`);
@@ -104,6 +106,22 @@ usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): P
         });
     }
 });
+
+usuarioRouter.get("/email/confirmation/:token", auth.checkTokenForEmailConfirm, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const usuario = await Usuario.confirmEmail(res.locals.email);
+        return res.status(200).json({
+            success: true,
+            message: usuario
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            error: error
+        });
+    }
+})
 
 
 export default usuarioRouter;
