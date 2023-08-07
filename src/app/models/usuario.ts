@@ -57,6 +57,12 @@ export class Usuario{
         return new Usuario(newUser);
     }
 
+    static async confirmEmail(email: string): Promise<IUsuario>{
+        return await db("usuarios").where({email})
+                    .update({ativo: true, emailConfirmado: true})
+                    .returning(Usuario.camposPublicos);
+    }
+
     static async desativa(apelido: string): Promise<IUsuario>{
         return await db("usuarios").where({apelido: apelido})
                     .update({ativo: false})
@@ -128,8 +134,16 @@ export class Usuario{
                 .first();
     }
 
+    static async searchForConfirmEmail(email: string): Promise<IUsuario | undefined>{
+        return  db("usuarios")
+                .select("email")
+                .where({ativo: true})
+                .whereRaw("lower(email) = ?", email.toLowerCase())
+                .first();
+    }
+
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
-        const user = await db<IUsuario>("usuarios").where({email: email, ativo: true}).first(); 
+        const user = await db<IUsuario>("usuarios").where({email: email, ativo: true, emailConfirmado: true}).first(); 
         if(!user) return false;
         const login = await this.compareSenhaCripto(senha, user);
         if(!login) return false;

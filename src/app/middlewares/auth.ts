@@ -29,6 +29,28 @@ class AuthMiddleware{
             });
         }
     }
+
+    public async checkTokenForEmailConfirm(req: Request, res: Response, next: NextFunction){
+        
+        const {token} = req.params;
+        try{
+            const usuario = await Auth.verifyTokenEmailConfirm(token);
+            if(!usuario) return res.status(401).json({
+                success: false,
+                message: "Acesso negado"
+            });
+            //Deixando o email visivel para a requisicao
+            res.locals.email = usuario.email;
+            return next();
+
+        }catch(error){
+            console.log(`-->>Error: Check Email Middleware: ${error} - ${token}`);
+            return res.status(401).json({
+                success: false,
+                message: "Acesso negado"
+            });
+        }
+    }
 }
 
 export default new AuthMiddleware();

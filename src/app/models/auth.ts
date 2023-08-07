@@ -1,3 +1,4 @@
+import { ITokenEmaiLConfirm } from "../interfaces/tokenEmailConfirm";
 import { ITokenLoginJWT } from "../interfaces/tokenLoginJWT";
 import { IUsuario } from "../interfaces/usuario";
 import { Usuario } from "./usuario";
@@ -28,6 +29,12 @@ export class Auth{
         let secret = process.env.TOKEN_JWT || "";
         const data = jwt.verify(String(token), secret) as ITokenLoginJWT;
         return Usuario.searchByApelido(data.apelido);        
+    }
+
+    static async verifyTokenEmailConfirm(token: string): Promise<IUsuario | undefined>{
+        let secret = process.env.TOKEN_JWT || "";
+        const data = jwt.verify(String(token), secret) as ITokenEmaiLConfirm;
+        return Usuario.searchForConfirmEmail(data.email);
     }
 
     private static generateToken(decodedToken: any): string{

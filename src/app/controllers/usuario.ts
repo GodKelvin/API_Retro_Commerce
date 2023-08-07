@@ -52,7 +52,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
         return res.status(200).json({
             success: true,
-            message: linkConfirmEmail
+            message: {link_confirm_email: linkConfirmEmail}
         });
     }catch(error){
         return res.status(500).json(`Internal Server Error => ${error}`);
@@ -107,13 +107,20 @@ usuarioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): P
     }
 });
 
-usuarioRouter.get("/email/confirmation/:token", async(req: Request, res: Response): Promise<any> => {
+usuarioRouter.get("/email/confirmation/:token", auth.checkTokenForEmailConfirm, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const usuario = await Usuario.confirmEmail(res.locals.email);
+        return res.status(200).json({
+            success: true,
+            message: usuario
+        });
 
-    //Receber email de confirmacacao via token
-    return res.status(200).json({
-        sucess: true,
-        message: "email"
-    })
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            error: error
+        });
+    }
 })
 
 
