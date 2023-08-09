@@ -25,13 +25,13 @@ export class Auth{
         return this.generateToken(decodedToken);
     }
     
-    static async verifyToken(token: string): Promise<IUsuario | undefined>{
+    static async verifyToken(token: string): Promise<Usuario | undefined>{
         let secret = process.env.TOKEN_JWT || "";
         const data = jwt.verify(String(token), secret) as ITokenLoginJWT;
         return Usuario.searchByApelido(data.apelido);        
     }
 
-    static async verifyTokenEmailConfirm(token: string): Promise<IUsuario | undefined>{
+    static async verifyTokenEmailConfirm(token: string): Promise<Usuario | undefined>{
         let secret = process.env.TOKEN_JWT || "";
         const data = jwt.verify(String(token), secret) as ITokenEmaiLConfirm;
         return Usuario.searchForConfirmEmail(data.email);
