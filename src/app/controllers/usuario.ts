@@ -85,9 +85,10 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
             success: true,
             message: resUpdate
         });
-    }catch(error){
+    }catch(error: any){
+        console.log(`>> ERROR: Update usuario {${res.locals.apelido}}\n${error}`);
         return res.status(500).json({
-            error: error
+            error: "Erro ao atualizar usuario. Por favor, tente mais tarde."
         })
     }
 });

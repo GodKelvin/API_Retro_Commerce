@@ -17,7 +17,7 @@ class AuthMiddleware{
             });
 
             //Deixando o apelido visivel para a requisicao
-            res.locals.apelido = usuario.apelido;
+            res.locals.apelido = usuario.getApelido();
 
             return next();
 
@@ -40,7 +40,7 @@ class AuthMiddleware{
                 message: "Acesso negado"
             });
             //Deixando o email visivel para a requisicao
-            res.locals.email = usuario.email;
+            res.locals.email = usuario.getEmail();
             return next();
 
         }catch(error){

@@ -28,21 +28,16 @@ export class Usuario{
     }
     
     async update(originalApelido: string): Promise<IUsuario>{
-        //Caso queira mudar o apelido
+        //Caso queira mudar a senha
         if(this.usuario.senha){
             this.usuario.senha = Usuario.criptoSenha(this.usuario.senha);
         }
 
-        return await db("usuarios")
+        const res =  await db("usuarios")
                     .where({apelido: originalApelido})
                     .update({...this.usuario, ...{atualizado_em: db.fn.now()}})
-                    .returning(Usuario.camposPublicos);
-    }
-
-    async desativa(): Promise<IUsuario>{
-        return await db("usuarios").where({apelido: this.usuario.apelido})
-                    .update({ativo: false})
-                    .returning(Usuario.camposPublicos);
+                    .returning(Usuario.camposPublicos) as IUsuario;
+        return res;
     }
 
     /*-----Metodos Estaticos-----*/
@@ -121,25 +116,28 @@ export class Usuario{
     }
 
     //Retorna campos sensiveis
-    static async searchFullByApelido(apelido: string): Promise <IUsuario | undefined>{
-        return  db("usuarios").where({apelido: apelido}).first();
+    static async searchFullByApelido(apelido: string): Promise <Usuario | undefined>{
+        const res = await db("usuarios").where({apelido: apelido}).first();
+        return res ? new Usuario(res) : res;
     }
 
     //Nao retorna campos sensiveis
-    static async searchByApelido(apelido: string): Promise <IUsuario | undefined>{
-        return  db("usuarios")
+    static async searchByApelido(apelido: string): Promise <Usuario | undefined>{
+        const res = await db("usuarios")
                 .select(this.camposPublicos)
                 .where({ativo: true})
                 .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
                 .first();
+        return res ? new Usuario(res) : res;
     }
 
-    static async searchForConfirmEmail(email: string): Promise<IUsuario | undefined>{
-        return  db("usuarios")
-                .select("email")
-                .where({ativo: true})
-                .whereRaw("lower(email) = ?", email.toLowerCase())
-                .first();
+    static async searchForConfirmEmail(email: string): Promise<Usuario | undefined>{
+        const res =  await db("usuarios")
+                    .select("email")
+                    .where({ativo: true})
+                    .whereRaw("lower(email) = ?", email.toLowerCase())
+                    .first();
+        return res ? new Usuario(res) : res;
     }
 
     static async usuarioLogin(email: string, senha: string): Promise<Usuario | false>{
