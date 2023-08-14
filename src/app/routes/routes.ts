@@ -2,6 +2,7 @@ import {Router} from "express";
 import { Request, Response } from "express";
 import usuarioRouter from "../controllers/usuario";
 import authRouter from "../controllers/login";
+import jogoRouter from "../controllers/jogo";
 
 const routes = Router();
 routes.get('/', async(_req: Request, res: Response) => {
@@ -9,7 +10,8 @@ routes.get('/', async(_req: Request, res: Response) => {
 });
 
 //Importacoes das rotas
-routes.use("/usuario", usuarioRouter);
-routes.use("/login", authRouter)
+routes.use("/usuarios", usuarioRouter);
+routes.use("/login", authRouter);
+routes.use("/jogos", jogoRouter);
 
 export default routes;
