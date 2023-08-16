@@ -18,6 +18,7 @@ class AuthMiddleware{
 
             //Deixando o apelido visivel para a requisicao
             res.locals.apelido = usuario.getApelido();
+            res.locals.usuarioId = usuario.getId();
 
             return next();
 

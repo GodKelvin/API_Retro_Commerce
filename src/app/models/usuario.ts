@@ -131,6 +131,15 @@ export class Usuario{
         return res ? new Usuario(res) : res;
     }
 
+    static async searchForCheckToken(apelido: string): Promise <Usuario | undefined>{
+        const res = await db("usuarios")
+                .select("apelido", "id")
+                .where({ativo: true})
+                .whereRaw("lower(apelido) = ?", apelido.toLowerCase())
+                .first();
+        return res ? new Usuario(res) : res;
+    }
+
     static async searchForConfirmEmail(email: string): Promise<Usuario | undefined>{
         const res =  await db("usuarios")
                     .select("email")

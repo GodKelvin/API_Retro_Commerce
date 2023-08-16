@@ -28,7 +28,7 @@ export class Auth{
     static async verifyToken(token: string): Promise<Usuario | undefined>{
         let secret = process.env.TOKEN_JWT || "";
         const data = jwt.verify(String(token), secret) as ITokenLoginJWT;
-        return Usuario.searchByApelido(data.apelido);        
+        return Usuario.searchForCheckToken(data.apelido);        
     }
 
     static async verifyTokenEmailConfirm(token: string): Promise<Usuario | undefined>{
