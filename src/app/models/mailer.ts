@@ -11,7 +11,7 @@ export class Mailer{
         const tokenConfirmEmail = Auth.generateTokenEmailConfirm(usuario);
         const htmlTemplate = await fs.promises.readFile("src/app/emails/confirmEmail.html", "utf-8");
         const template = Handlebars.compile(htmlTemplate);
-        const confirmationLink = `http://${host}/usuario/email/confirmation/${tokenConfirmEmail}`;
+        const confirmationLink = `http://${host}/usuarios/email/confirmation/${tokenConfirmEmail}`;
         const data = {usuario: usuario.getNome(), confirmationLink};
         const htmlToSend = template(data);
 

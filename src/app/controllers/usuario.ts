@@ -2,6 +2,8 @@ import { Request, Response, Router } from "express";
 import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
 import { Mailer } from "../models/mailer";
+import multerConfig from '../middlewares/multer';
+
 const usuarioRouter = Router();
 
 usuarioRouter.get("/:apelido", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
@@ -60,7 +62,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 });
 
-usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
         const validate = Usuario.validateFieldsForUpdate(req.body);
         if(validate.length) return res.status(400).json({
@@ -83,7 +85,8 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
 
         return res.status(200).json({
             success: true,
-            message: resUpdate
+            message: resUpdate,
+            img: req.file?.filename
         });
     }catch(error: any){
         console.log(`>> ERROR: Update usuario {${res.locals.apelido}}\n${error}`);
