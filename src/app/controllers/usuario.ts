@@ -3,8 +3,7 @@ import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
 import { Mailer } from "../models/mailer";
 import multerConfig from '../middlewares/multer';
-import { ImgurClient } from 'imgur';
-import fs from 'fs';
+import { ImgurApi } from "../models/imgurApi";
 
 
 const usuarioRouter = Router();
@@ -83,22 +82,11 @@ usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), 
             message: "Apelido indisponivel"
         });
 
-        const client = new ImgurClient({
-            clientId: process.env.CLIENT_ID_IMGUR,
-            clientSecret: process.env.CLIENTE_SECRET_IMGUR,
-            refreshToken: process.env.ACCESS_REFRSH_TOKEN_IMGUR,
-        });
-
-        // Enviar a imagem para o Imgur
-        //@TODO: transformar numa model
         if(req.file){
-            const fileBuffer = fs.readFileSync(req.file.path);
-            const base64Image = fileBuffer.toString('base64');
-            const response = client.upload({
-                image:  base64Image,
-                type: 'base64'
-            });
-            //tratar response
+            const imgApi = new ImgurApi();
+            //No momento, se espera o upload da imagem
+            const dataImage = await imgApi.uploadImage(req.file);
+            if(dataImage) req.body = {...req.body, ...{foto: dataImage.linkImage, fotoHashDelete: dataImage.hashDelete}}
         }
         
 
