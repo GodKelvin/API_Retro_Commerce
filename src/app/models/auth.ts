@@ -1,6 +1,5 @@
 import { ITokenEmaiLConfirm } from "../interfaces/tokenEmailConfirm";
 import { ITokenLoginJWT } from "../interfaces/tokenLoginJWT";
-import { IUsuario } from "../interfaces/usuario";
 import { Usuario } from "./usuario";
 import jwt from "jsonwebtoken";
 

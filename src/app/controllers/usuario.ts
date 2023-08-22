@@ -2,6 +2,10 @@ import { Request, Response, Router } from "express";
 import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
 import { Mailer } from "../models/mailer";
+import multerConfig from '../middlewares/multer';
+import { ImgurApi } from "../models/imgurApi";
+
+
 const usuarioRouter = Router();
 
 usuarioRouter.get("/:apelido", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
@@ -60,7 +64,7 @@ usuarioRouter.post("/", async(req: Request, res: Response): Promise<any> => {
 
 });
 
-usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
         const validate = Usuario.validateFieldsForUpdate(req.body);
         if(validate.length) return res.status(400).json({
@@ -78,12 +82,21 @@ usuarioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
             message: "Apelido indisponivel"
         });
 
+        if(req.file){
+            const imgApi = new ImgurApi();
+            //No momento, se espera o upload da imagem
+            const dataImage = await imgApi.uploadImage(req.file);
+            if(dataImage) req.body = {...req.body, ...{foto: dataImage.linkImage, fotoHashDelete: dataImage.hashDelete}}
+        }
+        
+
         const usuario = new Usuario(req.body);
         const resUpdate = await usuario.update(res.locals.apelido);
 
         return res.status(200).json({
             success: true,
-            message: resUpdate
+            message: resUpdate,
+            img: req.file?.path
         });
     }catch(error: any){
         console.log(`>> ERROR: Update usuario {${res.locals.apelido}}\n${error}`);
