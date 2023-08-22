@@ -3,6 +3,9 @@ import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
 import { Mailer } from "../models/mailer";
 import multerConfig from '../middlewares/multer';
+import { ImgurClient } from 'imgur';
+import fs from 'fs';
+
 
 const usuarioRouter = Router();
 
@@ -80,13 +83,32 @@ usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), 
             message: "Apelido indisponivel"
         });
 
+        const client = new ImgurClient({
+            clientId: process.env.CLIENT_ID_IMGUR,
+            clientSecret: process.env.CLIENTE_SECRET_IMGUR,
+            refreshToken: process.env.ACCESS_REFRSH_TOKEN_IMGUR,
+        });
+
+        // Enviar a imagem para o Imgur
+        //@TODO: transformar numa model
+        if(req.file){
+            const fileBuffer = fs.readFileSync(req.file.path);
+            const base64Image = fileBuffer.toString('base64');
+            const response = client.upload({
+                image:  base64Image,
+                type: 'base64'
+            });
+            //tratar response
+        }
+        
+
         const usuario = new Usuario(req.body);
         const resUpdate = await usuario.update(res.locals.apelido);
 
         return res.status(200).json({
             success: true,
             message: resUpdate,
-            img: req.file?.filename
+            img: req.file?.path
         });
     }catch(error: any){
         console.log(`>> ERROR: Update usuario {${res.locals.apelido}}\n${error}`);
