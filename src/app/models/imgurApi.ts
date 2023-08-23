@@ -23,8 +23,8 @@ class ImgurApi{
 
         const  dataImage: IImgur = {};
         if(response.status === 200){
-            dataImage.linkImage = response.data.link;
-            dataImage.hashDelete = response.data.deletehash
+            dataImage.foto = response.data.link;
+            dataImage.fotoHashDelete = response.data.deletehash
         }
         return dataImage;
     }
@@ -35,7 +35,6 @@ class ImgurApi{
             let dataImg = await this.uploadImage(img);
             dataImages.push(dataImg);
         }
-        console.log(dataImages);
         return dataImages;
     }
 

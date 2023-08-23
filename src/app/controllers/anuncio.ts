@@ -3,7 +3,6 @@ import auth from "../middlewares/auth";
 import { Anuncio } from "../models/anuncio";
 import { IAnuncio } from "../interfaces/anuncio";
 import multerConfig from '../middlewares/multer';
-import imgurApi from "../models/imgurApi";
 
 const anuncioRouter = Router();
 anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
@@ -17,9 +16,7 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
         novoAnuncio.usuarioId = res.locals.usuarioId;
         const anuncio = await Anuncio.create(novoAnuncio);
 
-        if(req.files){
-            const dataImg = imgurApi.uploadMultiplesImage(req.files);
-        }
+        if(req.files) anuncio.insereImagens(req.files)
 
         return res.status(200).json({
             success: true,
@@ -32,5 +29,4 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
         );
     }
 });
-
 export default anuncioRouter;

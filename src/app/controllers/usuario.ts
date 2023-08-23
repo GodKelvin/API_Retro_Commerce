@@ -85,7 +85,7 @@ usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), 
         if(req.file){
             //No momento, se espera o upload da imagem
             const dataImage = await ImgurApi.uploadImage(req.file);
-            if(dataImage) req.body = {...req.body, ...{foto: dataImage.linkImage, fotoHashDelete: dataImage.hashDelete}}
+            if(dataImage) req.body = {...req.body, ...{foto: dataImage.foto, fotoHashDelete: dataImage.fotoHashDelete}}
         }
         
 
