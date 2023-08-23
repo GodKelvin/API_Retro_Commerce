@@ -1,4 +1,4 @@
 export interface IImgur{
-    linkImage?: string;
-    hashDelete?: string;
+    foto?: string;
+    fotoHashDelete?: string;
 }

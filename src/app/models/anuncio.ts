@@ -1,8 +1,9 @@
 import { IAnuncio } from "../interfaces/anuncio";
 import db from "../../database/knexInit";
+import imgurApi from "../models/imgurApi";
 
 export class Anuncio{
-    anuncio: IAnuncio;
+    private anuncio: IAnuncio;
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
@@ -47,8 +48,20 @@ export class Anuncio{
         return errors
     }
 
-    static async create(anuncio: IAnuncio): Promise<any>{
-        const novoAnuncio = await db("anuncios").insert(anuncio).returning('*')
-        return novoAnuncio;
+    public static async create(anuncio: IAnuncio): Promise<Anuncio>{
+        const [novoAnuncio] = await db("anuncios").insert(anuncio).returning('*') as IAnuncio[]
+        return new Anuncio(novoAnuncio);
+    }
+
+    public async insereImagens(imagens: any): Promise<any>{
+        let dataImg = await imgurApi.uploadMultiplesImage(imagens);
+        dataImg = dataImg.map(img =>  ({ ...img, anuncioId: this.anuncio.id }));
+        
+        const response =  await db("fotos_anuncio").insert(dataImg).returning('*');
+        return response;
+    }
+
+    public static async getByJogo(jogoId: number): Promise<IAnuncio[]>{
+        return await db("anuncios").where(jogoId) as IAnuncio[]
     }
 }
