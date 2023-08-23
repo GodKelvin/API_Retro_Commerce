@@ -3,7 +3,7 @@ import { Usuario } from "../models/usuario";
 import auth from "../middlewares/auth";
 import { Mailer } from "../models/mailer";
 import multerConfig from '../middlewares/multer';
-import { ImgurApi } from "../models/imgurApi";
+import ImgurApi from "../models/imgurApi";
 
 
 const usuarioRouter = Router();
@@ -83,9 +83,8 @@ usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), 
         });
 
         if(req.file){
-            const imgApi = new ImgurApi();
             //No momento, se espera o upload da imagem
-            const dataImage = await imgApi.uploadImage(req.file);
+            const dataImage = await ImgurApi.uploadImage(req.file);
             if(dataImage) req.body = {...req.body, ...{foto: dataImage.linkImage, fotoHashDelete: dataImage.hashDelete}}
         }
         

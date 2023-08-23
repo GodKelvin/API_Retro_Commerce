@@ -30,6 +30,7 @@ class MulterMiddleware {
       let msg = null;
       if (err.code === "LIMIT_FILE_SIZE") msg = "Tamanho máximo do arquivo excedido";
       else msg = "Erro no servidor ao fazer upload. Por favor, tente mais tarde.";
+      console.log(`>> ERROR MUlter: ${err}`)
       return res.status(400).json({
         success: false,
         message: msg,

@@ -2,9 +2,11 @@ import { Request, Response, Router } from "express";
 import auth from "../middlewares/auth";
 import { Anuncio } from "../models/anuncio";
 import { IAnuncio } from "../interfaces/anuncio";
+import multerConfig from '../middlewares/multer';
+import imgurApi from "../models/imgurApi";
 
 const anuncioRouter = Router();
-anuncioRouter.post("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
         const validatorFields = Anuncio.validatorFieldsForCreate(req.body);
         if(validatorFields.length) return res.status(400).json({
@@ -14,6 +16,11 @@ anuncioRouter.post("/", auth.checkToken, async(req: Request, res: Response): Pro
         const novoAnuncio: IAnuncio = req.body;
         novoAnuncio.usuarioId = res.locals.usuarioId;
         const anuncio = await Anuncio.create(novoAnuncio);
+
+        if(req.files){
+            const dataImg = imgurApi.uploadMultiplesImage(req.files);
+        }
+
         return res.status(200).json({
             success: true,
             message: anuncio
