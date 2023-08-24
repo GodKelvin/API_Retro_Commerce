@@ -1,4 +1,5 @@
 import { IAnuncio } from "../interfaces/anuncio";
+import { IFotoAnuncio } from "../interfaces/fotoAnuncio";
 import db from "../../database/knexInit";
 import imgurApi from "../models/imgurApi";
 
@@ -29,6 +30,39 @@ export class Anuncio{
         //Verifica se foi passado algo nao permitido
         errors = errors.concat(this.validateFieldsDisponiveis(anuncio));
         return errors
+    }
+
+    public static async findById(id: number): Promise<Anuncio | undefined>{
+        const res = await db("anuncios").where({id}).first();
+        return res ? new Anuncio(res) : undefined;
+    }
+
+    public getUsuarioId(): number{
+        return this.anuncio.usuarioId;
+    }
+
+    public getId(): number{
+        return this.anuncio.id;
+    }
+
+    public async deleteAllImgs(): Promise<any>{
+        //Captura todas as fotos do anuncio
+        const imgsAnuncio: IFotoAnuncio[] = await db("fotos_anuncio").where({anuncioId: this.getId()}) as IFotoAnuncio[];
+
+        //Apaga todas as imgs do imgUr
+        for(const img of imgsAnuncio){
+            imgurApi.deleteImage(img.fotoHashDelete)
+        }
+
+        const resDelete = await db("fotos_anuncio").where({anuncioId: this.getId()}).del();
+        return resDelete;
+    }
+
+    public async deleteAnuncio(): Promise<any>{
+        //Primeiro apaga todas as imagens do anuncio
+        await this.deleteAllImgs();
+        const res = await db("anuncios").where({id: this.getId()}).del();
+        return res;
     }
 
     private static validateFieldsDisponiveis(anuncio: any): Array<string>{

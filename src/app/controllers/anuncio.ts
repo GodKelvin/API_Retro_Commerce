@@ -29,4 +29,28 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
         );
     }
 });
+
+anuncioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const anuncio = await Anuncio.findById(req.body.id);
+        if(!anuncio || (anuncio.getUsuarioId() != res.locals.usuarioId)){
+            return res.status(400).json({
+                success: false,
+                message: "Anuncio nao encontrado"
+            });
+        }
+        
+        anuncio.deleteAnuncio();
+
+        return res.status(200).json({
+            success: true,
+            message: "Anuncio apagado"
+        });
+    }catch(error: any){
+        console.log(`>> ERROR: DEL anuncios: ${req.body}}:\n${error}`);
+        return res.status(500).json({
+            error: `Erro ao apagar anuncio. Por favor, tente mais Tarde`}
+        );
+    }
+});
 export default anuncioRouter;
