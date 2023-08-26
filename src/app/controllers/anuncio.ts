@@ -6,20 +6,28 @@ import multerConfig from '../middlewares/multer';
 
 const anuncioRouter = Router();
 
-anuncioRouter.get("/usuario/:usuario", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
+anuncioRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        if(!req.params.usuario) return res.status(400).json({
+        if(!req.params.id || isNaN(Number(req.params.id))) return res.status(400).json({
             success: false,
-            message: "Informe um usuario"
+            message: "id de anuncio invalido"
         });
-
-
+        let search = await Anuncio.getById(Number(req.params.id))
+        if(!search) return res.status(400).json({
+            success: false,
+            message: "Anuncio nao encontrado"
+        });
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
     }catch(error){
-        console.log(`>>ERROR: GET ANUNCIOS USUARIO: ${error}`);
-        return res.status(500).json(`Internal Server Error => ${error}`);
+        console.log(`>>ERROR: GET ANUNCIO BY ID: ${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter anuncio. Por favor, tente mais Tarde`
+        });
     }
 });
-
 
 anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
@@ -41,8 +49,8 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
     }catch(error){
         console.log(`>> ERROR: POST anuncios: ${req.body}}:\n${error}`);
         return res.status(500).json({
-            error: `Erro ao obter anuncios. Por favor, tente mais Tarde`}
-        );
+            error: `Erro ao obter anuncios. Por favor, tente mais Tarde`
+        });
     }
 });
 

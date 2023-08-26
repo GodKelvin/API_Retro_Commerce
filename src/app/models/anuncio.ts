@@ -5,9 +5,16 @@ import imgurApi from "../models/imgurApi";
 
 export class Anuncio{
     private anuncio: IAnuncio;
-    private camposPublicos = ["caixa", "manual", "preco", "publico", "descricao", "estadoConservacaoId", "jogoId"]
+    static readonly camposPublicos = [  "id", "caixa", "manual", "preco", 
+                                        "publico", "descricao", "estadoConservacaoId", 
+                                        "jogoId", "consoleId", "criadoEm", "atualizadoEm"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
+    }
+
+
+    public static async getById(id: number): Promise<IAnuncio>{
+        return await db("anuncios").select(Anuncio.camposPublicos).where({id, publico: true}).first();
     }
 
     //Realiza busca com base no id do anuncio e do usuario
@@ -20,7 +27,7 @@ export class Anuncio{
         const res =  await db("anuncios")
                     .where({id: this.anuncio.id})
                     .update({...fieldsUpdate, ...{atualizado_em: db.fn.now()}})
-                    .returning(this.camposPublicos) as IAnuncio
+                    .returning(Anuncio.camposPublicos) as IAnuncio
 
         return res;
     }
