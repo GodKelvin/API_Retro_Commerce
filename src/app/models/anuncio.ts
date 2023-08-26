@@ -5,12 +5,30 @@ import imgurApi from "../models/imgurApi";
 
 export class Anuncio{
     private anuncio: IAnuncio;
+    private camposPublicos = ["caixa", "manual", "preco", "publico", "descricao", "estadoConservacaoId", "jogoId"]
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
 
+    //Realiza busca com base no id do anuncio e do usuario
+    public static async searchByIds(usuarioId: number, id: number): Promise<Anuncio | undefined>{
+        const res = await db("anuncios").where({usuarioId, id}).first();
+        return res ? new Anuncio(res): undefined;
+    }
 
-    static validatorFieldsForCreate(anuncio: any): Array<string>{
+    public async update(fieldsUpdate: IAnuncio): Promise<IAnuncio>{
+        const res =  await db("anuncios")
+                    .where({id: this.anuncio.id})
+                    .update({...fieldsUpdate, ...{atualizado_em: db.fn.now()}})
+                    .returning(this.camposPublicos) as IAnuncio
+
+        return res;
+    }
+
+    
+
+
+    public static validatorFieldsForCreate(anuncio: any): Array<string>{
         //@TODO: Validar formato dos campos
         let errors: string[] = [];
         const atributos = ["caixa", "manual", "preco", "publico", "descricao", "estadoConservacaoId"];
@@ -65,9 +83,11 @@ export class Anuncio{
         return res;
     }
 
-    private static validateFieldsDisponiveis(anuncio: any): Array<string>{
+    //ID disponivel somente para atualizacao
+    public static validateFieldsDisponiveis(anuncio: any, id?: string): Array<string>{
         const errors: string[] = [];
         const atributosDisponiveis = ["caixa", "manual", "preco", "publico", "descricao", "estadoConservacaoId","jogoId", "consoleId"];
+        id !== undefined ? atributosDisponiveis.push("id") : null;
 
         const chaveAnuncio = Object.keys(anuncio);
 
@@ -76,7 +96,6 @@ export class Anuncio{
         });
 
         if(atributosIndisponiveis.length){
-            console.log(atributosIndisponiveis)
             errors.push(`Atributos indisponiveis: ${atributosIndisponiveis.join(", ")}`);
         }
         return errors

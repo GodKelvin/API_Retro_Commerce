@@ -5,6 +5,22 @@ import { IAnuncio } from "../interfaces/anuncio";
 import multerConfig from '../middlewares/multer';
 
 const anuncioRouter = Router();
+
+anuncioRouter.get("/usuario/:usuario", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
+    try{
+        if(!req.params.usuario) return res.status(400).json({
+            success: false,
+            message: "Informe um usuario"
+        });
+
+
+    }catch(error){
+        console.log(`>>ERROR: GET ANUNCIOS USUARIO: ${error}`);
+        return res.status(500).json(`Internal Server Error => ${error}`);
+    }
+});
+
+
 anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
         const validatorFields = Anuncio.validatorFieldsForCreate(req.body);
@@ -30,16 +46,41 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
     }
 });
 
+anuncioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        //Garante que buscara o anuncio do respectivo usuario do token
+        const anuncio = await Anuncio.searchByIds(res.locals.usuarioId, req.body.id || null);
+        if(!anuncio) return res.status(400).json({
+            success: false,
+            message: "Anuncio nao encontrado"
+        });
+
+        const validatorFields = Anuncio.validateFieldsDisponiveis(req.body, "id");
+        if(validatorFields.length) return res.status(400).json({
+            success: false,
+            message: validatorFields
+        });
+        delete req.body.id
+        const resUpdate = await anuncio.update(req.body);
+        return res.status(200).json({
+            success: true,
+            message: resUpdate
+        });
+    }catch(error){
+        console.log(`>> ERROR: PATCH anuncios: ${req.body}}:\n${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter anuncios. Por favor, tente mais Tarde`}
+        );
+    }
+});
+
 anuncioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        const anuncio = await Anuncio.findById(req.body.id);
-        if(!anuncio || (anuncio.getUsuarioId() != res.locals.usuarioId)){
-            return res.status(400).json({
+        const anuncio = await Anuncio.searchByIds(res.locals.usuarioId, req.body.id || null);
+        if(!anuncio) return res.status(400).json({
                 success: false,
                 message: "Anuncio nao encontrado"
-            });
-        }
-        
+        });
         anuncio.deleteAnuncio();
 
         return res.status(200).json({
