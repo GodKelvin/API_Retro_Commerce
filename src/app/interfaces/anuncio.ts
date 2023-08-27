@@ -1,5 +1,5 @@
 export interface IAnuncio{
-    id?: number;
+    id: number;
     caixa: boolean;
     manual: boolean;
     preco: number;

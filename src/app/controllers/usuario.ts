@@ -90,6 +90,8 @@ usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), 
         
 
         const usuario = new Usuario(req.body);
+
+        //Garante que será atualizado com base no token
         const resUpdate = await usuario.update(res.locals.apelido);
 
         return res.status(200).json({
