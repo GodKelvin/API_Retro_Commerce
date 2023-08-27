@@ -5,11 +5,20 @@ import imgurApi from "../models/imgurApi";
 
 export class Anuncio{
     private anuncio: IAnuncio;
-    static readonly camposPublicos = [  "id", "caixa", "manual", "preco", 
+    static readonly camposPublicos = [  "anuncios.id as id", "caixa", "manual", "preco", 
                                         "publico", "descricao", "estadoConservacaoId", 
-                                        "jogoId", "consoleId", "criadoEm", "atualizadoEm"];
+                                        "jogoId", "consoleId", "anuncios.criadoEm as criadoEm", 
+                                        "anuncios.atualizadoEm as criadoEm"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
+    }
+
+    public static async getByUsuario(usuario: string): Promise<IAnuncio[]>{
+        return await db("anuncios")
+                    .join("usuarios", "anuncios.usuario_id", "usuarios.id")
+                    .where({"usuarios.ativo": true, "anuncios.publico": true})
+                    .whereRaw("LOWER(usuarios.apelido) = ?", usuario.toLowerCase())
+                    .select(Anuncio.camposPublicos)
     }
 
 

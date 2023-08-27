@@ -29,6 +29,25 @@ anuncioRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): P
     }
 });
 
+anuncioRouter.get("/usuario/:usuario", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        if(!req.params.usuario) return res.status(400).json({
+            success: false,
+            message: "Informe um usuario"
+        });
+        let search = await Anuncio.getByUsuario(req.params.usuario)
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
+    }catch(error){
+        console.log(`>>ERROR: GET ANUNCIO BY USUARIO: ${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter anuncio. Por favor, tente mais Tarde`
+        });
+    }
+});
+
 anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
         const validatorFields = Anuncio.validatorFieldsForCreate(req.body);
