@@ -19,7 +19,7 @@ jogoRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promise
     }catch(error){
         console.log(`>> ERROR: Get Jogos: ${req.params.console}}:\n${error}`);
         return res.status(500).json({
-            error: `Erro ao obter lista de jogos. Por favor, tente mais Tarde`}
+            error: `Erro ao obter lista de jogos. Por favor, tente mais tarde`}
         );
     }
 });

@@ -146,7 +146,6 @@ CREATE TABLE "compras" (
   "criado_em" timestamp DEFAULT (now()),
   "atualizado_em" timestamp DEFAULT (now()),
   "usuario_comprador_id" integer,
-  "usuario_vendedor_id" integer,
   "endereco_compra_id" integer
 );
 
@@ -193,7 +192,5 @@ ALTER TABLE "avaliacoes" ADD FOREIGN KEY ("compra_avaliada_id") REFERENCES "comp
 ALTER TABLE "compras" ADD FOREIGN KEY ("status") REFERENCES "status_compra" ("id");
 
 ALTER TABLE "compras" ADD FOREIGN KEY ("usuario_comprador_id") REFERENCES "usuarios" ("id");
-
-ALTER TABLE "compras" ADD FOREIGN KEY ("usuario_vendedor_id") REFERENCES "usuarios" ("id");
 
 ALTER TABLE "compras" ADD FOREIGN KEY ("endereco_compra_id") REFERENCES "endereco_compra" ("id");

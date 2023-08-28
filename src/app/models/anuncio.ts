@@ -13,6 +13,10 @@ export class Anuncio{
         this.anuncio = anuncio;
     }
 
+    public debugger(): IAnuncio{
+        return this.anuncio;
+    }
+
     public static async getByUsuario(usuario: string): Promise<IAnuncio[]>{
         return await db("anuncios")
                     .join("usuarios", "anuncios.usuario_id", "usuarios.id")
@@ -68,6 +72,11 @@ export class Anuncio{
 
     public static async findById(id: number): Promise<Anuncio | undefined>{
         const res = await db("anuncios").where({id}).first();
+        return res ? new Anuncio(res) : undefined;
+    }
+
+    public static async findForCompra(id: number): Promise<Anuncio | undefined>{
+        const res = await db("anuncios").where({id, publico: true}).first();
         return res ? new Anuncio(res) : undefined;
     }
 
