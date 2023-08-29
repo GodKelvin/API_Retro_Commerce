@@ -45,10 +45,11 @@ CREATE TABLE "enderecos" (
   "estado" varchar(50),
   "cidade" varchar(50),
   "bairro" varchar(50),
+  "rua" varchar(255),
   "numero" integer,
-  "cep" integer,
+  "cep" varchar(10),
   "nome" varchar(50),
-  "ponto_referencia" varchar(50),
+  "ponto_referencia" varchar(255),
   "usuario_id" integer,
   "criado_em" timestamp DEFAULT (now()),
   "atualizado_em" timestamp DEFAULT (now())
@@ -142,7 +143,7 @@ CREATE TABLE "compras" (
   "valor_total" float,
   "comprovante_pagamento" varchar(255),
   "codigo_rastreio" varchar(50),
-  "status" integer,
+  "status_compra_id" integer,
   "criado_em" timestamp DEFAULT (now()),
   "atualizado_em" timestamp DEFAULT (now()),
   "usuario_comprador_id" integer,
@@ -189,7 +190,7 @@ ALTER TABLE "fotos_anuncio" ADD FOREIGN KEY ("anuncio_id") REFERENCES "anuncios"
 
 ALTER TABLE "avaliacoes" ADD FOREIGN KEY ("compra_avaliada_id") REFERENCES "compras" ("id");
 
-ALTER TABLE "compras" ADD FOREIGN KEY ("status") REFERENCES "status_compra" ("id");
+ALTER TABLE "compras" ADD FOREIGN KEY ("status_compra_id") REFERENCES "status_compra" ("id");
 
 ALTER TABLE "compras" ADD FOREIGN KEY ("usuario_comprador_id") REFERENCES "usuarios" ("id");
 

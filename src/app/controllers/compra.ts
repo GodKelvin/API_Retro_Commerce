@@ -1,18 +1,24 @@
 import { Request, Response, Router } from "express";
 import auth from "../middlewares/auth";
-import multerConfig from '../middlewares/multer';
 import { Anuncio } from "../models/anuncio";
+import { Endereco } from "../models/endereco";
 
 const compraRouter = Router();
 
 compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        if(!req.body.anuncioId) return res.status(400).json({
+        if(!req.body.anuncioId || !req.body.enderecoId) return res.status(400).json({
             success: false,
-            message: "Informe um anuncio"
+            message: "Informe um anuncio e um endereco"
         });
         const anuncio = await Anuncio.findForCompra(req.body.anuncioId);
         if(!anuncio) return res.status(400).json({
+            success: false,
+            message: "Anuncio nao encontrado"
+        });
+
+        const endereco = await Endereco.searchByid(req.body.enderecoId);
+        if(!endereco) return res.status(400).json({
             success: false,
             message: "Anuncio nao encontrado"
         });
