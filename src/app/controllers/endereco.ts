@@ -7,7 +7,6 @@ const enderecoRouter = Router();
 
 enderecoRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        console.log(res.locals.usuarioId);
         const enderecos = await Endereco.searchByUsuarioId(res.locals.usuarioId);
         return res.status(200).json({
             success: true,

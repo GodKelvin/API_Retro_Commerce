@@ -1,5 +1,5 @@
 export interface IEndereco{
-    id: number;
+    id?: number;
     pais: string;
     estado: string;
     cidade: string;
@@ -7,9 +7,9 @@ export interface IEndereco{
     rua: string;
     numero: number;
     cep: string;
-    nome: string;
+    nome?: string;
     pontReferencia: string;
-    usuarioId: number;
-    criadoEm: Date;
-    atualizadoEm: Date;
+    usuarioId?: number;
+    criadoEm?: Date;
+    atualizadoEm?: Date;
 } 
