@@ -96,8 +96,7 @@ usuarioRouter.patch("/", auth.checkToken, multerConfig.upload.single('avatar'), 
 
         return res.status(200).json({
             success: true,
-            message: resUpdate,
-            img: req.file?.path
+            message: resUpdate
         });
     }catch(error: any){
         console.log(`>> ERROR: Update usuario {${res.locals.apelido}}\n${error}`);
