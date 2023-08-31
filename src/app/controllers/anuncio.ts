@@ -66,7 +66,7 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
             message: anuncio
         });
     }catch(error){
-        console.log(`>> ERROR: POST anuncios: ${req.body}}:\n${error}`);
+        console.log(`>> ERROR: POST anuncios: ${req.body}:\n${error}`);
         return res.status(500).json({
             error: `Erro ao obter anuncios. Por favor, tente mais Tarde`
         });
@@ -77,7 +77,7 @@ anuncioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
     try{
         //Garante que buscara o anuncio do respectivo usuario do token
         const anuncio = await Anuncio.searchByIds(res.locals.usuarioId, req.body.id || null);
-        if(!anuncio) return res.status(400).json({
+        if(!anuncio || await anuncio.comprado()) return res.status(400).json({
             success: false,
             message: "Anuncio nao encontrado"
         });
@@ -104,7 +104,7 @@ anuncioRouter.patch("/", auth.checkToken, async(req: Request, res: Response): Pr
 anuncioRouter.delete("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         const anuncio = await Anuncio.searchByIds(res.locals.usuarioId, req.body.id || null);
-        if(!anuncio) return res.status(400).json({
+        if(!anuncio || await anuncio.comprado()) return res.status(400).json({
                 success: false,
                 message: "Anuncio nao encontrado"
         });

@@ -41,7 +41,11 @@ export class Anuncio{
         return res;
     }
 
-    
+    public async comprado(): Promise <boolean>{
+        //Status compra 5 & 6: Rejeitada e Cancelada
+        const res = await db("compras").where({anuncio_id: this.anuncio.id}).whereIn("status_compra_id", [1,2,3,4,5,6]).first();
+        return !!res;
+    }
 
 
     public static validatorFieldsForCreate(anuncio: any): Array<string>{
@@ -68,6 +72,11 @@ export class Anuncio{
 
     public static async findById(id: number): Promise<Anuncio | undefined>{
         const res = await db("anuncios").where({id}).first();
+        return res ? new Anuncio(res) : undefined;
+    }
+
+    public static async findForCompra(id: number): Promise<Anuncio | undefined>{
+        const res = await db("anuncios").where({id, publico: true}).first();
         return res ? new Anuncio(res) : undefined;
     }
 
@@ -118,7 +127,7 @@ export class Anuncio{
     }
 
     public static async create(anuncio: IAnuncio): Promise<Anuncio>{
-        const [novoAnuncio] = await db("anuncios").insert(anuncio).returning('*') as IAnuncio[]
+        const [novoAnuncio] = await db("anuncios").insert(anuncio).returning('*') as IAnuncio[];
         return new Anuncio(novoAnuncio);
     }
 

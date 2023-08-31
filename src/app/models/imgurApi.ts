@@ -8,7 +8,7 @@ class ImgurApi{
         this.client = new ImgurClient({
             clientId: process.env.CLIENT_ID_IMGUR,
             clientSecret: process.env.CLIENTE_SECRET_IMGUR,
-            refreshToken: process.env.ACCESS_REFRSH_TOKEN_IMGUR,
+            refreshToken: process.env.ACCESS_REFRESH_TOKEN_IMGUR,
         });
     }
 

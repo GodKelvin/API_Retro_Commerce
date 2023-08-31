@@ -8,3 +8,6 @@ VALUES  ('Mega Drive', 'Genesis', 'Sega', 4, '1998-10-29', '1989-08-14', '1990-0
 
 INSERT INTO estados_conservacao (estado)
 VALUES ('Lacrado'), ('Novo'), ('Quase Novo'), ('Ligeiramente Usado'), ('Usado'), ('Muito Usado'), ('Danificado');
+
+INSERT INTO status_compra (status)
+VALUES('Aguardando Pagamento'), ('Paga'), ('Enviada'), ('Realizada'), ('Rejeitada'), ('Cancelada');
