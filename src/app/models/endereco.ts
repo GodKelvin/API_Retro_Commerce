@@ -17,8 +17,8 @@ export class Endereco{
         return await db("enderecos").select(Endereco.camposPublicos).where({usuarioId}) as IEndereco[];
     }
 
-    public static async searchByid(id: number): Promise<Endereco | undefined>{
-        const res = await db("enderecos").select(Endereco.camposPublicos).where({id}).first();
+    public static async searchByid(id: number, usuarioId: number): Promise<Endereco | undefined>{
+        const res = await db("enderecos").select(Endereco.camposPublicos).where({id, usuarioId}).first();
         return res ? new Endereco(res) : undefined;
     }
 

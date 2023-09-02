@@ -10,4 +10,4 @@ INSERT INTO estados_conservacao (estado)
 VALUES ('Lacrado'), ('Novo'), ('Quase Novo'), ('Ligeiramente Usado'), ('Usado'), ('Muito Usado'), ('Danificado');
 
 INSERT INTO status_compra (status)
-VALUES('Aguardando Pagamento'), ('Paga'), ('Enviada'), ('Realizada'), ('Rejeitada'), ('Cancelada');
+VALUES('Aguardando Pagamento'), ('Comprovante Enviado'), ('Paga'), ('Enviada'), ('Realizada'), ('Rejeitada'), ('Cancelada');
