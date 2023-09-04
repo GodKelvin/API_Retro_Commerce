@@ -44,7 +44,7 @@ class MulterMiddleware {
     next: NextFunction
   ) => {
     if (err) {
-      const defaultErrorMessage = 'Erro no servidor ao fazer upload. Por favor, tente mais tarde.';
+      const defaultErrorMessage = 'Erro no servidor ao fazer upload. Verifique o tipo de arquivo e tente mais tarde.';
       const errorMsg = this.errorMessages[err.code] || defaultErrorMessage;
       console.log(`>> ERROR MUlter: ${err.message}`)
       return res.status(400).json({

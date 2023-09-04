@@ -1,6 +1,7 @@
 export interface ICompra{
     id?: number;
     comprovantePagamento?: string;
+    comprovantePagamentoHashDelete?: string
     codigoRastreio?: string;
     statusCompraId: number;
     criadoEm?: Date;

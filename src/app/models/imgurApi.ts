@@ -38,8 +38,9 @@ class ImgurApi{
         return dataImages;
     }
 
-    public async deleteImage(hashDelete: string): Promise<any>{
-        return await this.client.deleteImage(hashDelete);
+    public async deleteImage(hashDelete: string): Promise<boolean>{
+        const res = await this.client.deleteImage(hashDelete);
+        return res.success;
     }
 
     private convertToBase64(imagem: any): string{
