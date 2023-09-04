@@ -56,8 +56,7 @@ export class Compra{
         return novaCompra;
     }
 
-    //@TODO: Trocar para search comprador?
-    public static async searchByIds(id: number, compradorId: number): Promise<Compra | undefined>{
+    public static async searchCompradorByIds(id: number, compradorId: number): Promise<Compra | undefined>{
         const res = await db("compras").where({id, usuario_comprador_id: compradorId}).first();
         return res ? new Compra(res) : undefined;
     }
@@ -76,10 +75,20 @@ export class Compra{
         const [res] =  await db("compras")
                     .where({id: this.compra.id})
                     .update({
-                        id: this.compra.id,
                         atualizadoEm: db.fn.now(),
                         statusCompraId: idCompraEnviada,
                         codigoRastreio
+                    }).returning(Compra.camposPublicos) as ICompra[];
+        return res;
+    }
+
+    public async setCompraRecebida(): Promise<ICompra>{
+        const idCompraRecebida = await this.searchIdStatusCompra(this.statusCompra.realizada);
+        const [res] =  await db("compras")
+                    .where({id: this.compra.id})
+                    .update({
+                        atualizadoEm: db.fn.now(),
+                        statusCompraId: idCompraRecebida
                     }).returning(Compra.camposPublicos) as ICompra[];
         return res;
     }
