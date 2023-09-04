@@ -58,8 +58,7 @@ anuncioRouter.post("/", auth.checkToken, multerConfig.upload.array('photos', 10)
         const novoAnuncio: IAnuncio = req.body;
         novoAnuncio.usuarioId = res.locals.usuarioId;
         const anuncio = await Anuncio.create(novoAnuncio);
-
-        if(req.files) anuncio.insereImagens(req.files)
+        if(req.files?.length) anuncio.insereImagens(req.files)
 
         return res.status(200).json({
             success: true,

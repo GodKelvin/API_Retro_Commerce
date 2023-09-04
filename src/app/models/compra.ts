@@ -7,8 +7,8 @@ import imgurApi from "./imgurApi";
 
 export class Compra{
     private compra: ICompra;
-    private camposPublicos = [  "id", "comprovantePagamento", "codigoRastreio", "statusCompraId", 
-                                "criadoEm", "atualizadoEm", "enderecoCompraId", "anuncioId"];
+    static readonly camposPublicos = [  "compras.id", "comprovantePagamento", "codigoRastreio", "statusCompraId", 
+                                "compras.criadoEm", "compras.atualizadoEm", "enderecoCompraId", "anuncioId"];
     private statusCompra = {
         aguardandoPagamento: "Aguardando Pagamento",
         comprovanteEnviado: "Comprovante Enviado",
@@ -56,9 +56,32 @@ export class Compra{
         return novaCompra;
     }
 
+    //@TODO: Trocar para search comprador?
     public static async searchByIds(id: number, compradorId: number): Promise<Compra | undefined>{
         const res = await db("compras").where({id, usuario_comprador_id: compradorId}).first();
         return res ? new Compra(res) : undefined;
+    }
+
+    public static async searchVendedorByIds(id: number, vendedorId: number): Promise<Compra | undefined>{
+        const res = await   db("compras")
+                            .join("anuncios", "compras.anuncioId", "anuncios.id")
+                            .where({"compras.id": id, "anuncios.usuarioId": vendedorId})
+                            .select(Compra.camposPublicos)
+                            .first();
+        return res ? new Compra(res) : undefined;                 
+    }
+
+    public async setCodRastreio(codigoRastreio: string): Promise<ICompra>{
+        const idCompraEnviada = await this.searchIdStatusCompra(this.statusCompra.enviada);
+        const [res] =  await db("compras")
+                    .where({id: this.compra.id})
+                    .update({
+                        id: this.compra.id,
+                        atualizadoEm: db.fn.now(),
+                        statusCompraId: idCompraEnviada,
+                        codigoRastreio
+                    }).returning(Compra.camposPublicos) as ICompra[];
+        return res;
     }
 
     public async setComprovantePagamento(dataImage: IImgur): Promise<ICompra>{
@@ -71,7 +94,7 @@ export class Compra{
                         comprovantePagamentoHashDelete: dataImage.fotoHashDelete,
                         statusCompraId: idComprovanteEnviado
                     })
-                    .returning(this.camposPublicos) as ICompra[];
+                    .returning(Compra.camposPublicos) as ICompra[];
 
         return res;
     }
