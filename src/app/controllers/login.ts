@@ -5,6 +5,11 @@ const loginRouter = Router();
 
 loginRouter.post("/", async(req: Request, res: Response): Promise<any> => {
     const {email, senha} = req.body;
+
+    if(!email || !senha) return res.status(400).json({
+        success: false,
+        message: "Email ou senha pendentes"
+    });
     const user = await Usuario.usuarioLogin(email, senha);
 
     if(!user) return res.status(401).json({

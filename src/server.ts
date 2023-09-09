@@ -6,8 +6,11 @@ import express from "express";
 import knex from "./database/knexInit";
 //Importando o arquivo principal das rotas
 import routes from "./app/routes/routes";
+import cors from 'cors';
 
 const server = express();
+server.use(cors());
+
 //Permite converter o dado que vem em json
 server.use(express.json());
 server.use(routes);
