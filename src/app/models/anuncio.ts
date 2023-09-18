@@ -5,7 +5,6 @@ import imgurApi from "../models/imgurApi";
 
 export class Anuncio{
     private anuncio: IAnuncio;
-    static readonly getByParams = ["jogo", ]
     static readonly camposPublicos = [  "anuncios.id as id", "caixa", "manual", "preco", 
                                         "publico", "descricao", "estadoConservacaoId", 
                                         "anuncios.jogoId", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
