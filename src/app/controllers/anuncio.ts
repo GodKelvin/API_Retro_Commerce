@@ -6,6 +6,21 @@ import multerConfig from '../middlewares/multer';
 
 const anuncioRouter = Router();
 
+anuncioRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const search = await Anuncio.search(req.query);
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
+    }catch(error){
+        console.log(`>>ERROR: Get Anuncios: ${req.params}\n: ${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter lista de anuncios. Por favor, tente mais tarde`}
+        );
+    }
+});
+
 anuncioRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.params.id || isNaN(Number(req.params.id))) return res.status(400).json({
