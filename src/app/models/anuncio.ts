@@ -5,12 +5,32 @@ import imgurApi from "../models/imgurApi";
 
 export class Anuncio{
     private anuncio: IAnuncio;
+    static readonly getByParams = ["jogo", ]
     static readonly camposPublicos = [  "anuncios.id as id", "caixa", "manual", "preco", 
                                         "publico", "descricao", "estadoConservacaoId", 
-                                        "jogoId", "consoleId", "anuncios.criadoEm as criadoEm", 
-                                        "anuncios.atualizadoEm as criadoEm"];
+                                        "anuncios.jogoId", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
+                                        "anuncios.atualizadoEm as atualizadoEm"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
+    }
+
+    public static async search(query: any): Promise<IAnuncio[]>{
+        let consulta = db("anuncios").join("jogos", "jogos.id", "anuncios.jogo_id")
+
+        if(query.dataInicio){
+            consulta = consulta.where("anuncios.criado_em", '>=', query.dataInicio)
+        }
+
+        if(query.dataFim){
+            consulta = consulta.where("anuncios.criado_em", '<', query.dataFim)
+        }
+
+        if(query.jogo){
+            consulta = consulta.where("jogos.nome", "ilike", `%${query.jogo}%`)
+        }
+
+        //@TODO: Paginar
+        return await consulta.select(this.camposPublicos).where({publico: true})
     }
 
     public static async getByUsuario(usuario: string): Promise<IAnuncio[]>{
