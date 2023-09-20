@@ -9,12 +9,19 @@ export class Anuncio{
                                         "publico", "descricao", "estadoConservacaoId", 
                                         "anuncios.jogoId", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
                                         "anuncios.atualizadoEm as atualizadoEm"];
+
+    static readonly camposPublicosGet = [  "anuncios.id as id", "caixa", "manual", "preco", 
+                                        "publico", "descricao", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
+                                        "anuncios.atualizadoEm as atualizadoEm", "jogos.nome as jogoNome",
+                                        "estadosConservacao.estado as conservacao"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
 
     public static async search(query: any): Promise<IAnuncio[]>{
-        let consulta = db("anuncios").join("jogos", "jogos.id", "anuncios.jogo_id")
+        let consulta =  db("anuncios")
+                        .join("jogos", "jogos.id", "anuncios.jogo_id")
+                        .join("estadosConservacao", "estados_conservacao.id", "anuncios.estadoConservacaoId")
 
         if(query.dataInicio){
             consulta = consulta.where("anuncios.criado_em", '>=', query.dataInicio)
@@ -29,7 +36,7 @@ export class Anuncio{
         }
 
         //@TODO: Paginar
-        return await consulta.select(this.camposPublicos).where({publico: true})
+        return await consulta.select(this.camposPublicosGet).where({publico: true});
     }
 
     public static async getByUsuario(usuario: string): Promise<IAnuncio[]>{

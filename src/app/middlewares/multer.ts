@@ -26,7 +26,7 @@ class MulterMiddleware {
 
   public upload = multer({
     storage: configStorage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
+    limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10MB
     fileFilter: (req, file, callback) => {
       if (this.arquivosImagensPermitidos.includes(file.mimetype)) {
         callback(null, true);
