@@ -6,6 +6,7 @@ import jogoRouter from "../controllers/jogo";
 import anuncioRouter from "../controllers/anuncio";
 import compraRouter from '../controllers/compra';
 import enderecoRouter from "../controllers/endereco";
+import estadoConservacaoRouter from "../controllers/estadoConservacao";
 
 const routes = Router();
 routes.get('/', async(_req: Request, res: Response) => {
@@ -19,5 +20,6 @@ routes.use("/jogos", jogoRouter);
 routes.use("/anuncios", anuncioRouter);
 routes.use("/compras", compraRouter);
 routes.use("/enderecos", enderecoRouter);
+routes.use("/estados-conservacao", estadoConservacaoRouter);
 
 export default routes;
