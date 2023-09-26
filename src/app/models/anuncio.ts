@@ -18,6 +18,14 @@ export class Anuncio{
         this.anuncio = anuncio;
     }
 
+    public static async searchAllAnunciosUsuario(usuarioId: number): Promise<IAnuncio[]>{
+        return await db("anuncios")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
+                    .where({"anuncios.usuarioId": usuarioId})
+                    .select(this.camposPublicosGet);
+    }
+
     public static async search(query: any): Promise<IAnuncio[]>{
         let consulta =  db("anuncios")
                         .join("jogos", "jogos.id", "anuncios.jogo_id")

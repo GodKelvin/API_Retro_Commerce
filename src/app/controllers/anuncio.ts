@@ -44,6 +44,21 @@ anuncioRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): P
     }
 });
 
+anuncioRouter.get("/all/me", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const search = await Anuncio.searchAllAnunciosUsuario(res.locals.usuarioId);
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
+    }catch(error){
+        console.log(`>>ERROR: GET ALL ANUNCIOS USUARIO: ${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter seus anuncios. Por favor, tente mais Tarde`
+        }); 
+    }
+});
+
 anuncioRouter.get("/usuario/:usuario", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.params.usuario) return res.status(400).json({
