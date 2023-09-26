@@ -14,7 +14,7 @@ export class Jogo{
 
     static async search(query: any): Promise<IJogo[]>{
 
-        const colunas = ["jogos.nome", "jogos.publicadora", "jogos.desenvolvedora", "jogos.lancamento_jp",
+        const colunas = ["jogos.id as id", "jogos.nome", "jogos.publicadora", "jogos.desenvolvedora", "jogos.lancamento_jp",
                         "jogos.lancamento_na", "jogos.lancamento_pal", "consoles.nome AS plataforma"]
 
         let consulta = db("jogos").join("consoles", "jogos.console_id", "consoles.id")
