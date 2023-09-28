@@ -11,4 +11,5 @@ export interface IAnuncio{
     jogoId?: number;
     consoleId: number;
     usuarioId: number;
+    imagens?: Array<string>;
 } 

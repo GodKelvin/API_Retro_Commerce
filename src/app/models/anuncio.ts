@@ -14,8 +14,28 @@ export class Anuncio{
                                         "publico", "descricao", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
                                         "anuncios.atualizadoEm as atualizadoEm", "jogos.nome as jogoNome",
                                         "estadosConservacao.estado as conservacao"];
+
+
+    static readonly camposPublicosDetalhes = [  "anuncios.id as id", "caixa", "manual", "preco", 
+                                                "publico", "descricao", "estadosConservacao.estado as conservacao", 
+                                                "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
+                                                "jogos.nome as jogoNome", "usuarios.apelido as anunciante"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
+    }
+
+    public static async getImagesAnuncio(id: number): Promise<any>{
+        return await db("fotosAnuncio").where({anuncio_id: id}).select("foto");
+    }
+
+    public static async getAnuncioDetalhes(id: number): Promise<IAnuncio>{
+        return await db("anuncios")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
+                    .join("usuarios", "usuarios.id", "anuncios.usuarioId")
+                    .where({"anuncios.id": id, publico: true})
+                    .select(Anuncio.camposPublicosDetalhes)
+                    .first();
     }
 
     public static async searchAllAnunciosUsuario(usuarioId: number): Promise<IAnuncio[]>{
@@ -30,6 +50,7 @@ export class Anuncio{
         let consulta =  db("anuncios")
                         .join("jogos", "jogos.id", "anuncios.jogo_id")
                         .join("estadosConservacao", "estados_conservacao.id", "anuncios.estadoConservacaoId")
+                        .join("usuarios", "usuarios.id", "anuncios.usuarioId")
 
         if(query.dataInicio){
             consulta = consulta.where("anuncios.criado_em", '>=', query.dataInicio)
@@ -44,7 +65,7 @@ export class Anuncio{
         }
 
         //@TODO: Paginar
-        return await consulta.select(this.camposPublicosGet).where({publico: true});
+        return await consulta.select(this.camposPublicosGet).where({publico: true, "usuarios.ativo": true});
     }
 
     public static async getByUsuario(usuario: string): Promise<IAnuncio[]>{

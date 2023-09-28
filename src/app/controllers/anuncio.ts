@@ -27,11 +27,16 @@ anuncioRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): P
             success: false,
             message: "id de anuncio invalido"
         });
-        let search = await Anuncio.getById(Number(req.params.id))
+        const idAnuncio = Number(req.params.id);
+        let search = await Anuncio.getAnuncioDetalhes(idAnuncio);
+        
         if(!search) return res.status(400).json({
             success: false,
             message: "Anuncio nao encontrado"
         });
+
+        let images = await Anuncio.getImagesAnuncio(idAnuncio);
+        search["imagens"] = images;
         return res.status(200).json({
             success: true,
             message: search
