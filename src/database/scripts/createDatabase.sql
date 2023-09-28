@@ -94,7 +94,7 @@ CREATE TABLE "anuncios" (
   "manual" boolean,
   "preco" float,
   "publico" boolean,
-  "descricao" varchar(255),
+  "descricao" varchar(1000),
   "estado_conservacao_id" integer,
   "jogo_id" integer,
   "console_id" integer,

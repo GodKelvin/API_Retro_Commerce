@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 
 export class Usuario{
     usuario: IUsuario;
-    static readonly camposPublicos  = ["foto", "nome", "bio", "apelido", "avaliacao"];
+    static readonly camposPublicos  = ["foto", "nome", "bio", "apelido", "avaliacao", "criadoEm"];
 
     constructor(usuario: IUsuario){
         this.usuario = usuario;
