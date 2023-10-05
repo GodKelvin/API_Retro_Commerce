@@ -142,7 +142,7 @@ export class Anuncio{
     public getId(): number{
         return this.anuncio.id;
     }
-
+    
     public async deleteAllImgs(): Promise<any>{
         //Captura todas as fotos do anuncio
         const imgsAnuncio: IFotoAnuncio[] = await db("fotos_anuncio").where({anuncioId: this.getId()}) as IFotoAnuncio[];
