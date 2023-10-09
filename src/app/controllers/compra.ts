@@ -16,7 +16,9 @@ compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Prom
             message: "Informe um anuncio e um endereco"
         });
         const anuncio = await Anuncio.findForCompra(req.body.anuncioId);
-        if(!anuncio) return res.status(400).json({
+
+        //O comprador não pode ser o proprio anunciante
+        if(!anuncio || (anuncio.getUsuarioId() == res.locals.usuarioId)) return res.status(400).json({
             success: false,
             message: "Anuncio nao encontrado"
         });
