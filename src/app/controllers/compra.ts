@@ -9,6 +9,23 @@ import ImgurApi from "../models/imgurApi";
 
 const compraRouter = Router();
 
+compraRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const compras = await Compra.getCompras(res.locals.usuarioId);
+        return res.status(200).json({
+            success: true,
+            message: compras
+        });
+    }catch(error){
+        console.log(`>> ERROR GET ANUNCIOS: Error: ${error}.`);
+        return res.status(500).json({
+            success: false,
+            message: "Erro ao obter pedidos. Por favor, tente mais tarde."
+        });
+    }
+});
+
+
 compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.body.anuncioId || !req.body.enderecoId) return res.status(400).json({

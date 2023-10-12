@@ -18,8 +18,24 @@ export class Compra{
         rejeitada: "Rejeitada"
     };
 
+    static readonly infoCompra = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
+                                    "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
+                                    "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
+                                    "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto"];
+
     constructor(compra: ICompra){
         this.compra = compra;
+    }
+
+    public static async getCompras(usuarioId: number): Promise<Compra[]>{
+        return await db("compras")
+                    .join("anuncios", "anuncios.id", "compras.anuncioId")
+                    .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
+                    .distinctOn("compras.id")
+                    .where({usuarioCompradorId: usuarioId})
+                    .select(Compra.infoCompra);
     }
     
     public static async create(
