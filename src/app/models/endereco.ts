@@ -22,6 +22,10 @@ export class Endereco{
         return res ? new Endereco(res) : undefined;
     }
 
+    public getData(): IEndereco{
+        return this.endereco;
+    }
+
     public forNewCompra(): IEndereco{
         const enderecoFornewCompra = this.endereco;
         delete enderecoFornewCompra.id;
