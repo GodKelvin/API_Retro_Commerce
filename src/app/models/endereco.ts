@@ -8,6 +8,15 @@ export class Endereco{
         this.endereco = endereco;
     }
 
+    public static async getEnderecoCompra(enderecoCompraId: number, usuarioId: number): Promise<Endereco | undefined>{
+        const res = await db("enderecoCompra")
+                    .join("compras", "compras.enderecoCompraId", "enderecoCompra.id")
+                    .where({"compras.usuarioCompradorId": usuarioId, "enderecoCompra.id": enderecoCompraId})
+                    .select("enderecoCompra.*")
+                    .first();
+        return res ? new Endereco(res) : undefined;
+    }
+
     public static async create(endereco: IEndereco): Promise<IEndereco>{
         const [novoEndereco] = await db("enderecos").insert(endereco).returning(this.camposPublicos) as IEndereco[];
         return novoEndereco;
@@ -31,7 +40,6 @@ export class Endereco{
         delete enderecoFornewCompra.id;
         delete enderecoFornewCompra.criadoEm;
         delete enderecoFornewCompra.atualizadoEm;
-        delete enderecoFornewCompra.nome;
         delete enderecoFornewCompra.usuarioId;
         return enderecoFornewCompra;
     }

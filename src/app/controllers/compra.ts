@@ -25,6 +25,34 @@ compraRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promi
     }
 });
 
+compraRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        if(!req.params.id || isNaN(Number(req.params.id))) return res.status(400).json({
+            success: false,
+            message: "id de compra invalido"
+        });
+        const idCompra = Number(req.params.id);
+        let search = await Anuncio.getAnuncioDetalhesCompra(idCompra, res.locals.usuarioId);
+        
+        if(!search) return res.status(400).json({
+            success: false,
+            message: "Compra nao encontrada"
+        });
+
+        let images = await Anuncio.getImagesAnuncio(search.id);
+        search["imagens"] = images;
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
+    }catch(error){
+        console.log(`>>ERROR: GET COMPRA BY ID: ${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter compra. Por favor, tente mais Tarde`
+        });
+    }
+});
+
 
 compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
@@ -52,9 +80,10 @@ compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Prom
             message: "Erro ao realizar compra. Por favor, tente mais tarde."
         });
         
+        const resumoCompra = await Compra.getResumoCompra(Number(compra.id), res.locals.usuarioId);
         return res.status(200).json({
             sucess: true,
-            message: compra
+            message: resumoCompra
         });
     }catch(error){
         console.log(`>> ERROR POST ANUNCIO: Error: ${error}.`);

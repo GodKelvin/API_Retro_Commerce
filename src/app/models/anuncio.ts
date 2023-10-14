@@ -20,6 +20,12 @@ export class Anuncio{
                                                 "publico", "descricao", "estadosConservacao.estado as conservacao", 
                                                 "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
                                                 "jogos.nome as jogoNome", "usuarios.apelido as anunciante"];
+
+    static readonly camposPublicosDetalhesCompra = [    "anuncios.id as id", "caixa", "manual", "preco", 
+                                                        "publico", "descricao", "estadosConservacao.estado as conservacao", 
+                                                        "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
+                                                        "jogos.nome as jogoNome", "usuarios.apelido as anunciante", "statusCompra.status",
+                                                        "compras.codigoRastreio"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
@@ -35,6 +41,18 @@ export class Anuncio{
                     .join("usuarios", "usuarios.id", "anuncios.usuarioId")
                     .where({"anuncios.id": id, publico: true})
                     .select(Anuncio.camposPublicosDetalhes)
+                    .first();
+    }
+
+    public static async getAnuncioDetalhesCompra(compraId: number, usuarioId: number): Promise<IAnuncio>{
+        return await db("anuncios")
+                    .join("compras", "compras.anuncioId", "anuncios.id")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
+                    .join("usuarios", "usuarios.id", "anuncios.usuarioId")
+                    .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .where({"compras.id": compraId, "compras.usuarioCompradorId": usuarioId})
+                    .select(Anuncio.camposPublicosDetalhesCompra)
                     .first();
     }
 
