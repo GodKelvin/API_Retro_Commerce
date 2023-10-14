@@ -153,7 +153,7 @@ compraRouter.patch("/rastreio", auth.checkToken, async(req: Request, res: Respon
 
 compraRouter.patch("/confirma-entrega", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     if(!req.body.compraId) return res.status(400).json({
-        sucess: false,
+        success: false,
         message: "Pendente dados da compra"
     });
 

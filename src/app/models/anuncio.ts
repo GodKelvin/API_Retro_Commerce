@@ -25,7 +25,7 @@ export class Anuncio{
                                                         "publico", "descricao", "estadosConservacao.estado as conservacao", 
                                                         "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
                                                         "jogos.nome as jogoNome", "usuarios.apelido as anunciante", "statusCompra.status",
-                                                        "compras.codigoRastreio"];
+                                                        "compras.codigoRastreio", "compras.comprovantePagamento"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
