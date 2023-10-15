@@ -26,6 +26,12 @@ export class Anuncio{
                                                         "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
                                                         "jogos.nome as jogoNome", "usuarios.apelido as anunciante", "statusCompra.status",
                                                         "compras.codigoRastreio", "compras.comprovantePagamento"];
+
+    static readonly camposPublicosDetalhesVenda = [ "anuncios.id as id", "caixa", "manual", "preco", 
+                                                    "publico", "descricao", "estadosConservacao.estado as conservacao", 
+                                                    "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
+                                                    "jogos.nome as jogoNome", "usuarios.apelido as comprador", "statusCompra.status",
+                                                    "compras.codigoRastreio", "compras.comprovantePagamento"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
@@ -53,6 +59,18 @@ export class Anuncio{
                     .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
                     .where({"compras.id": compraId, "compras.usuarioCompradorId": usuarioId})
                     .select(Anuncio.camposPublicosDetalhesCompra)
+                    .first();
+    }
+
+    public static async getAnuncioDetalhesVenda(compraId: number, usuarioId: number): Promise<IAnuncio>{
+        return await db("anuncios")
+                    .join("compras", "compras.anuncioId", "anuncios.id")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
+                    .join("usuarios", "usuarios.id", "compras.usuarioCompradorId")
+                    .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .where({"compras.id": compraId, "anuncios.usuarioId": usuarioId})
+                    .select(Anuncio.camposPublicosDetalhesVenda)
                     .first();
     }
 

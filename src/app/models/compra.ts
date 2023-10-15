@@ -24,6 +24,12 @@ export class Compra{
                                     "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
                                     "usuarios.apelido as anunciante"];
 
+    static readonly infoVenda = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
+                                    "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
+                                    "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
+                                    "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
+                                    "usuarios.apelido as comprador"];
+
     constructor(compra: ICompra){
         this.compra = compra;
     }
@@ -51,6 +57,18 @@ export class Compra{
                     .distinctOn("compras.id")
                     .where({usuarioCompradorId: usuarioId})
                     .select(Compra.infoCompra);
+    }
+
+    public static async getVendas(usuarioId: number): Promise<Compra[]>{
+        return await db("compras")
+                    .join("anuncios", "anuncios.id", "compras.anuncioId")
+                    .join("usuarios", "usuarios.id", "compras.usuarioCompradorId")
+                    .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
+                    .distinctOn("compras.id")
+                    .where({"anuncios.usuarioId": usuarioId})
+                    .select(Compra.infoVenda);
     }
     
     public static async create(
