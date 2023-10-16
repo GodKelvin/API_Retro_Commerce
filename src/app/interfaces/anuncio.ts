@@ -12,4 +12,6 @@ export interface IAnuncio{
     consoleId: number;
     usuarioId: number;
     imagens?: Array<string>;
+    //Quando se busca somente o resumo dos anuncios
+    foto?: string
 } 

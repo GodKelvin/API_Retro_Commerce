@@ -11,9 +11,15 @@ export class Anuncio{
                                         "anuncios.atualizadoEm as atualizadoEm"];
 
     static readonly camposPublicosGet = [  "anuncios.id as id", "caixa", "manual", "preco", 
-                                        "publico", "descricao", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
-                                        "anuncios.atualizadoEm as atualizadoEm", "jogos.nome as jogoNome",
-                                        "estadosConservacao.estado as conservacao"];
+                                            "publico", "descricao", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
+                                            "anuncios.atualizadoEm as atualizadoEm", "jogos.nome as jogoNome",
+                                            "estadosConservacao.estado as conservacao", "fotosAnuncio.foto as foto",
+                                            "usuarios.apelido as anunciante"];
+
+    static readonly camposPublicosPessoal = [  "anuncios.id as id", "caixa", "manual", "preco", 
+                                            "publico", "descricao", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
+                                            "anuncios.atualizadoEm as atualizadoEm", "jogos.nome as jogoNome",
+                                            "estadosConservacao.estado as conservacao", "fotosAnuncio.foto as foto"];
 
 
     static readonly camposPublicosDetalhes = [  "anuncios.id as id", "caixa", "manual", "preco", 
@@ -78,8 +84,10 @@ export class Anuncio{
         return await db("anuncios")
                     .join("jogos", "jogos.id", "anuncios.jogoId")
                     .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
+                    .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
+                    .distinctOn("anuncios.id")
                     .where({"anuncios.usuarioId": usuarioId})
-                    .select(this.camposPublicosGet);
+                    .select(this.camposPublicosPessoal);
     }
 
     public static async search(query: any): Promise<IAnuncio[]>{
@@ -87,6 +95,8 @@ export class Anuncio{
                         .join("jogos", "jogos.id", "anuncios.jogo_id")
                         .join("estadosConservacao", "estados_conservacao.id", "anuncios.estadoConservacaoId")
                         .join("usuarios", "usuarios.id", "anuncios.usuarioId")
+                        .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
+                        .distinctOn("anuncios.id")
 
         if(query.dataInicio){
             consulta = consulta.where("anuncios.criado_em", '>=', query.dataInicio)
