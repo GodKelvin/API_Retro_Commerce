@@ -54,6 +54,7 @@ compraRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): Pr
 });
 
 
+
 compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.body.anuncioId || !req.body.enderecoId) return res.status(400).json({
@@ -147,8 +148,6 @@ compraRouter.patch("/rastreio", auth.checkToken, async(req: Request, res: Respon
         success: true,
         message: resUpdate
     });
-
-
 });
 
 compraRouter.patch("/confirma-entrega", auth.checkToken, async(req: Request, res: Response): Promise<any> => {

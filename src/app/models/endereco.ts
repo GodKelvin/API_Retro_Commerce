@@ -11,7 +11,9 @@ export class Endereco{
     public static async getEnderecoCompra(enderecoCompraId: number, usuarioId: number): Promise<Endereco | undefined>{
         const res = await db("enderecoCompra")
                     .join("compras", "compras.enderecoCompraId", "enderecoCompra.id")
-                    .where({"compras.usuarioCompradorId": usuarioId, "enderecoCompra.id": enderecoCompraId})
+                    .join("anuncios", "anuncios.id", "compras.anuncioId")
+                    .where({"enderecoCompra.id": enderecoCompraId, "compras.usuarioCompradorId": usuarioId})
+                    .orWhere({"enderecoCompra.id": enderecoCompraId, "anuncios.usuarioId": usuarioId})
                     .select("enderecoCompra.*")
                     .first();
         return res ? new Endereco(res) : undefined;
