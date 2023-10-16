@@ -34,6 +34,28 @@ export class Compra{
         this.compra = compra;
     }
 
+    public async aceitarComprovante(): Promise<ICompra>{
+        const idPago = await this.searchIdStatusCompra(this.statusCompra.paga);
+        const [resUpdate] = await db("compras")
+                        .where({"compras.id": this.compra.id})
+                        .update({
+                            atualizadoEm: db.fn.now(),
+                            statusCompraId: idPago
+                        }).returning(Compra.camposPublicos) as ICompra[];
+        return resUpdate;
+    }
+
+    public async recusarComprovante(): Promise<ICompra>{
+        const idPago = await this.searchIdStatusCompra(this.statusCompra.rejeitada);
+        const [resUpdate] = await db("compras")
+                        .where({"compras.id": this.compra.id})
+                        .update({
+                            atualizadoEm: db.fn.now(),
+                            statusCompraId: idPago
+                        }).returning(Compra.camposPublicos) as ICompra[];
+        return resUpdate;
+    }
+
     public static async getResumoCompra(compraId: number, usuarioId: number): Promise<Compra>{
         return await db("compras")
                     .join("anuncios", "anuncios.id", "compras.anuncioId")
@@ -69,6 +91,19 @@ export class Compra{
                     .distinctOn("compras.id")
                     .where({"anuncios.usuarioId": usuarioId})
                     .select(Compra.infoVenda);
+    }
+
+    public static async getDetalhesVenda(vendaId: number, usuarioId: number): Promise<Compra>{
+        return await db("compras")
+                    .join("anuncios", "anuncios.id", "compras.anuncioId")
+                    .join("usuarios", "usuarios.id", "compras.usuarioCompradorId")
+                    .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
+                    .distinctOn("compras.id")
+                    .where({"anuncios.usuarioId": usuarioId, "compras.id": vendaId})
+                    .select(Compra.infoVenda)
+                    .first();
     }
     
     public static async create(

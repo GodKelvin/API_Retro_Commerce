@@ -25,52 +25,6 @@ compraRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promi
     }
 });
 
-compraRouter.get("/vendas", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
-    try{
-        console.log("Vendas", res.locals.usuarioId);
-        const compras = await Compra.getVendas(res.locals.usuarioId);
-        return res.status(200).json({
-            success: true,
-            message: compras
-        });
-    }catch(error){
-        console.log(`>> ERROR GET ANUNCIOS: Error: ${error}.`);
-        return res.status(500).json({
-            success: false,
-            message: "Erro ao obter pedidos. Por favor, tente mais tarde."
-        });
-    }
-});
-
-compraRouter.get("/vendas/:id", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
-    try{
-        if(!req.params.id || isNaN(Number(req.params.id))) return res.status(400).json({
-            success: false,
-            message: "id de venda invalido"
-        });
-        const idCompra = Number(req.params.id);
-        let search = await Anuncio.getAnuncioDetalhesVenda(idCompra, res.locals.usuarioId);
-        
-        if(!search) return res.status(400).json({
-            success: false,
-            message: "Venda nao encontrada"
-        });
-
-        let images = await Anuncio.getImagesAnuncio(search.id);
-        search["imagens"] = images;
-        return res.status(200).json({
-            success: true,
-            message: search
-        });
-    }catch(error){
-        console.log(`>>ERROR: GET COMPRA BY ID: ${error}`);
-        return res.status(500).json({
-            error: `Erro ao obter compra. Por favor, tente mais Tarde`
-        });
-    }
-});
-
-
 compraRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.params.id || isNaN(Number(req.params.id))) return res.status(400).json({
@@ -194,8 +148,6 @@ compraRouter.patch("/rastreio", auth.checkToken, async(req: Request, res: Respon
         success: true,
         message: resUpdate
     });
-
-
 });
 
 compraRouter.patch("/confirma-entrega", auth.checkToken, async(req: Request, res: Response): Promise<any> => {

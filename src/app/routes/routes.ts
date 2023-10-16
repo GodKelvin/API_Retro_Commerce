@@ -7,6 +7,7 @@ import anuncioRouter from "../controllers/anuncio";
 import compraRouter from '../controllers/compra';
 import enderecoRouter from "../controllers/endereco";
 import estadoConservacaoRouter from "../controllers/estadoConservacao";
+import vendaRouter from "../controllers/venda";
 
 const routes = Router();
 routes.get('/', async(_req: Request, res: Response) => {
@@ -21,5 +22,6 @@ routes.use("/anuncios", anuncioRouter);
 routes.use("/compras", compraRouter);
 routes.use("/enderecos", enderecoRouter);
 routes.use("/estados-conservacao", estadoConservacaoRouter);
+routes.use("/vendas", vendaRouter);
 
 export default routes;
