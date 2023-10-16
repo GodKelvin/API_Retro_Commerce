@@ -102,4 +102,24 @@ vendaRouter.patch("/recusar-comprovante", auth.checkToken, async(req: Request, r
     }
 });
 
+vendaRouter.patch("/rastreio", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    if(!req.body.codigoRastreio || !req.body.vendaId) return res.status(400).json({
+        sucess: false,
+        message: "Pendente codigo de rastreio ou dados da compra"
+    });
+
+    const compra = await Compra.searchVendedorByIds(req.body.vendaId, res.locals.usuarioId);
+    if(!compra) return res.status(400).json({
+        success: false,
+        message: "Compra nao encontrada"
+    });
+    
+    await compra.setCodRastreio(req.body.codigoRastreio);
+    const resumoVenda = await Compra.getDetalhesVenda(req.body.vendaId, res.locals.usuarioId);
+    return res.status(200).json({
+        success: true,
+        message: resumoVenda
+    });
+});
+
 export default vendaRouter;
