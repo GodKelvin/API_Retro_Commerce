@@ -8,7 +8,7 @@ const anuncioRouter = Router();
 
 anuncioRouter.get("/", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
-        const search = await Anuncio.search(req.query);
+        const search = await Anuncio.searchWithPrecos(req.query);
         return res.status(200).json({
             success: true,
             message: search

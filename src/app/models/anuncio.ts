@@ -90,6 +90,49 @@ export class Anuncio{
                     .select(this.camposPublicosPessoal);
     }
 
+    public static async searchWithPrecos(query: any): Promise<IAnuncio[]>{
+        let consulta =  db("anuncios")
+                        .join("jogos", "jogos.id", "anuncios.jogo_id")
+                        .join("estadosConservacao", "estados_conservacao.id", "anuncios.estadoConservacaoId")
+                        .join("usuarios", "usuarios.id", "anuncios.usuarioId")
+                        .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
+                        .select(
+                            db.raw(`MAX(fotos_anuncio.foto) AS foto`),
+                            db.raw(`MIN("anuncios"."preco") OVER (PARTITION BY "jogos"."id") AS preco_minimo`),
+                            db.raw(`AVG("anuncios"."preco") OVER (PARTITION BY "jogos"."id") AS preco_Medio`),
+                            db.raw(`MAX("anuncios"."preco") OVER (PARTITION BY "jogos"."id") AS preco_maximo`),
+                            'caixa',
+                            'manual',
+                            'preco',
+                            'publico',
+                            'descricao',
+                            'anuncios.jogo_id',
+                            'anuncios.console_id',
+                            'anuncios.criado_em',
+                            'anuncios.atualizado_em',
+                            'jogos.nome as jogoNome',
+                            'estados_conservacao.estado as conservacao',
+                            'usuarios.apelido as anunciante',
+                            'anuncios.id',
+                        )
+                        .groupBy("anuncios.id", "jogos.id", "estadosConservacao.estado", "usuarios.apelido")
+
+        if(query.dataInicio){
+            consulta = consulta.where("anuncios.criado_em", '>=', query.dataInicio)
+        }
+
+        if(query.dataFim){
+            consulta = consulta.where("anuncios.criado_em", '<', query.dataFim)
+        }
+
+        if(query.jogo){
+            consulta = consulta.where("jogos.nome", "ilike", `%${query.jogo}%`)
+        }
+
+        //@TODO: Paginar
+        return await consulta.where({publico: true, "usuarios.ativo": true});
+    }
+
     public static async search(query: any): Promise<IAnuncio[]>{
         let consulta =  db("anuncios")
                         .join("jogos", "jogos.id", "anuncios.jogo_id")

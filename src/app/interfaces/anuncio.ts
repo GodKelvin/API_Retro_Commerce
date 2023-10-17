@@ -13,5 +13,9 @@ export interface IAnuncio{
     usuarioId: number;
     imagens?: Array<string>;
     //Quando se busca somente o resumo dos anuncios
-    foto?: string
+    foto?: string;
+    precoMinimo?: number;
+    precoMedio?: number;
+    precoMaximo?: number;
+    conservacao?: string;
 } 
