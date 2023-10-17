@@ -110,8 +110,8 @@ export class Anuncio{
                             'anuncios.console_id',
                             'anuncios.criado_em',
                             'anuncios.atualizado_em',
-                            'jogos.nome',
-                            'estados_conservacao.estado',
+                            'jogos.nome as jogoNome',
+                            'estados_conservacao.estado as conservacao',
                             'usuarios.apelido as anunciante',
                             'anuncios.id',
                         )

@@ -17,4 +17,5 @@ export interface IAnuncio{
     precoMinimo?: number;
     precoMedio?: number;
     precoMaximo?: number;
+    conservacao?: string;
 } 
