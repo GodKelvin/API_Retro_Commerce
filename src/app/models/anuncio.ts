@@ -129,6 +129,10 @@ export class Anuncio{
             consulta = consulta.where("jogos.nome", "ilike", `%${query.jogo}%`)
         }
 
+        if(query.limit){
+            consulta = consulta.limit(30)
+        }
+
         //@TODO: Paginar
         return await consulta.where({publico: true, "usuarios.ativo": true});
     }

@@ -49,6 +49,21 @@ anuncioRouter.get("/:id", auth.checkToken, async(req: Request, res: Response): P
     }
 });
 
+anuncioRouter.get("/all/ultimos", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
+    try{
+        const search = await Anuncio.searchWithPrecos({limit: 30});
+        return res.status(200).json({
+            success: true,
+            message: search
+        });
+    }catch(error){
+        console.log(`>>ERROR: GET ULTIMOS ANUNCIOS USUARIO: ${error}`);
+        return res.status(500).json({
+            error: `Erro ao obter ultimos anuncios. Por favor, tente mais Tarde`
+        }); 
+    }
+});
+
 anuncioRouter.get("/all/me", auth.checkToken, async(req: Request, res: Response): Promise<any> => {
     try{
         const search = await Anuncio.searchAllAnunciosUsuario(res.locals.usuarioId);
