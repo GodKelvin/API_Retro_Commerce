@@ -22,13 +22,13 @@ export class Compra{
                                     "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
                                     "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
                                     "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
-                                    "usuarios.apelido as anunciante"];
+                                    "usuarios.apelido as anunciante", "consoles.nome as plataforma"];
 
     static readonly infoVenda = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
                                     "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
                                     "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
                                     "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
-                                    "usuarios.apelido as comprador"];
+                                    "usuarios.apelido as comprador", "consoles.nome as plataforma"];
 
     constructor(compra: ICompra){
         this.compra = compra;
@@ -75,6 +75,7 @@ export class Compra{
                     .join("usuarios", "usuarios.id", "anuncios.usuarioId")
                     .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
                     .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .join("consoles", "consoles.id", "jogos.console_id")
                     .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
                     .distinctOn("compras.id")
                     .where({usuarioCompradorId: usuarioId})
@@ -87,6 +88,7 @@ export class Compra{
                     .join("usuarios", "usuarios.id", "compras.usuarioCompradorId")
                     .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
                     .join("jogos", "jogos.id", "anuncios.jogoId")
+                    .join("consoles", "consoles.id", "jogos.console_id")
                     .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
                     .distinctOn("compras.id")
                     .where({"anuncios.usuarioId": usuarioId})

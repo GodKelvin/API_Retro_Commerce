@@ -19,25 +19,27 @@ export class Anuncio{
     static readonly camposPublicosPessoal = [  "anuncios.id as id", "caixa", "manual", "preco", 
                                             "publico", "descricao", "anuncios.consoleId", "anuncios.criadoEm as criadoEm", 
                                             "anuncios.atualizadoEm as atualizadoEm", "jogos.nome as jogoNome",
-                                            "estadosConservacao.estado as conservacao", "fotosAnuncio.foto as foto"];
+                                            "estadosConservacao.estado as conservacao", "fotosAnuncio.foto as foto",
+                                            "consoles.nome as plataforma"];
 
 
     static readonly camposPublicosDetalhes = [  "anuncios.id as id", "caixa", "manual", "preco", 
                                                 "publico", "descricao", "estadosConservacao.estado as conservacao", 
                                                 "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
-                                                "jogos.nome as jogoNome", "usuarios.apelido as anunciante"];
+                                                "jogos.nome as jogoNome", "usuarios.apelido as anunciante",
+                                                "consoles.nome as plataforma"];
 
     static readonly camposPublicosDetalhesCompra = [    "anuncios.id as id", "caixa", "manual", "preco", 
                                                         "publico", "descricao", "estadosConservacao.estado as conservacao", 
                                                         "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
                                                         "jogos.nome as jogoNome", "usuarios.apelido as anunciante", "statusCompra.status",
-                                                        "compras.codigoRastreio", "compras.comprovantePagamento"];
+                                                        "compras.codigoRastreio", "compras.comprovantePagamento", "consoles.nome as plataforma"];
 
     static readonly camposPublicosDetalhesVenda = [ "anuncios.id as id", "caixa", "manual", "preco", 
                                                     "publico", "descricao", "estadosConservacao.estado as conservacao", 
                                                     "anuncios.criadoEm as criadoEm", "anuncios.atualizadoEm as atualizadoEm",
                                                     "jogos.nome as jogoNome", "usuarios.apelido as comprador", "statusCompra.status",
-                                                    "compras.codigoRastreio", "compras.comprovantePagamento"];
+                                                    "compras.codigoRastreio", "compras.comprovantePagamento", "consoles.nome as plataforma"];
     constructor(anuncio: IAnuncio){
         this.anuncio = anuncio;
     }
@@ -51,6 +53,7 @@ export class Anuncio{
                     .join("jogos", "jogos.id", "anuncios.jogoId")
                     .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
                     .join("usuarios", "usuarios.id", "anuncios.usuarioId")
+                    .join("consoles", "consoles.id", "jogos.console_id")
                     .where({"anuncios.id": id, publico: true})
                     .select(Anuncio.camposPublicosDetalhes)
                     .first();
@@ -63,6 +66,7 @@ export class Anuncio{
                     .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
                     .join("usuarios", "usuarios.id", "anuncios.usuarioId")
                     .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .join("consoles", "consoles.id", "jogos.console_id")
                     .where({"compras.id": compraId, "compras.usuarioCompradorId": usuarioId})
                     .select(Anuncio.camposPublicosDetalhesCompra)
                     .first();
@@ -75,6 +79,7 @@ export class Anuncio{
                     .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
                     .join("usuarios", "usuarios.id", "compras.usuarioCompradorId")
                     .join("statusCompra", "statusCompra.id", "compras.statusCompraId")
+                    .join("consoles", "consoles.id", "jogos.console_id")
                     .where({"compras.id": compraId, "anuncios.usuarioId": usuarioId})
                     .select(Anuncio.camposPublicosDetalhesVenda)
                     .first();
@@ -84,6 +89,7 @@ export class Anuncio{
         return await db("anuncios")
                     .join("jogos", "jogos.id", "anuncios.jogoId")
                     .join("estadosConservacao", "estadosConservacao.id", "anuncios.estadoConservacaoId")
+                    .join("consoles", "consoles.id", "jogos.console_id")
                     .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
                     .distinctOn("anuncios.id")
                     .where({"anuncios.usuarioId": usuarioId})
@@ -95,6 +101,7 @@ export class Anuncio{
                         .join("jogos", "jogos.id", "anuncios.jogo_id")
                         .join("estadosConservacao", "estados_conservacao.id", "anuncios.estadoConservacaoId")
                         .join("usuarios", "usuarios.id", "anuncios.usuarioId")
+                        .join("consoles", "consoles.id", "jogos.console_id")
                         .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
                         .select(
                             db.raw(`MAX(fotos_anuncio.foto) AS foto`),
@@ -114,8 +121,9 @@ export class Anuncio{
                             'estados_conservacao.estado as conservacao',
                             'usuarios.apelido as anunciante',
                             'anuncios.id',
+                            'consoles.nome as plataforma'
                         )
-                        .groupBy("anuncios.id", "jogos.id", "estadosConservacao.estado", "usuarios.apelido")
+                        .groupBy("anuncios.id", "jogos.id", "estadosConservacao.estado", "usuarios.apelido", "consoles.nome")
 
         if(query.dataInicio){
             consulta = consulta.where("anuncios.criado_em", '>=', query.dataInicio)
