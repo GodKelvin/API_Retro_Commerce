@@ -95,7 +95,7 @@ vendaRouter.patch("/recusar-comprovante", auth.checkToken, async(req: Request, r
             message: resumoVenda
         });
     }catch(error){
-        console.log(`>>ERROR: PATCH UPDATE VENDA ACEITA COMPROVANTE: ${error}`);
+        console.log(`>>ERROR: PATCH UPDATE VENDA RECUSA COMPROVANTE: ${error}`);
         return res.status(500).json({
             error: `Erro ao atualizar venda. Por favor, tente mais tarde.`
         });

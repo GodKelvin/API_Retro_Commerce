@@ -18,17 +18,29 @@ export class Compra{
         rejeitada: "Rejeitada"
     };
 
-    static readonly infoCompra = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
+    static readonly infoCompraWithConsole = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
                                     "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
                                     "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
                                     "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
                                     "usuarios.apelido as anunciante", "consoles.nome as plataforma"];
 
-    static readonly infoVenda = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
+    static readonly infoCompra = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
+                                    "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
+                                    "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
+                                    "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
+                                    "usuarios.apelido as anunciante"];
+
+    static readonly infoVendaWithConsole = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
                                     "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
                                     "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
                                     "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
                                     "usuarios.apelido as comprador", "consoles.nome as plataforma"];
+
+    static readonly infoVenda = [  "compras.id", "comprovantePagamento", "codigoRastreio", 
+                                    "statusCompra.status", "compras.criadoEm", "compras.atualizadoEm",
+                                    "compras.enderecoCompraId", "compras.anuncioId", "jogos.nome as itemNome",
+                                    "anuncios.caixa", "anuncios.manual", "anuncios.preco", "fotosAnuncio.foto as foto",
+                                    "usuarios.apelido as comprador"];
 
     constructor(compra: ICompra){
         this.compra = compra;
@@ -92,7 +104,7 @@ export class Compra{
                     .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
                     .distinctOn("compras.id")
                     .where({"anuncios.usuarioId": usuarioId})
-                    .select(Compra.infoVenda);
+                    .select(Compra.infoVendaWithConsole);
     }
 
     public static async getDetalhesVenda(vendaId: number, usuarioId: number): Promise<Compra>{
