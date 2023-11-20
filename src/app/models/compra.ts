@@ -91,7 +91,7 @@ export class Compra{
                     .leftJoin("fotosAnuncio", "anuncios.id", "fotosAnuncio.anuncioId")
                     .distinctOn("compras.id")
                     .where({usuarioCompradorId: usuarioId})
-                    .select(Compra.infoCompra);
+                    .select(Compra.infoCompraWithConsole);
     }
 
     public static async getVendas(usuarioId: number): Promise<Compra[]>{
