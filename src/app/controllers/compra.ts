@@ -98,7 +98,7 @@ compraRouter.post("/", auth.checkToken, async(req: Request, res: Response): Prom
 compraRouter.patch("/upload-comprovante", auth.checkToken, multerConfig.upload.single('comprovante-pagamento'), multerConfig.multerErrorHandler, async(req: Request, res: Response): Promise<any> => {
     try{
         if(!req.file || !req.body.compraId) return res.status(400).json({
-            sucess: false,
+            success: false,
             message: "Pendente comprovante de pagamento ou dados da compra."
         });
         const compra = await Compra.searchCompradorByIds(req.body.compraId, res.locals.usuarioId);
